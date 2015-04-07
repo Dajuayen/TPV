@@ -12,10 +12,15 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
@@ -45,6 +50,10 @@ public class TPVJFrame extends JFrame {
     private HashMap<String, ProductoPedido> listaPedidos; // Aqui se almacenan los productos pedidos
     private JPanel jPanelListaProductos; // Panel donde van apareciendo los productos de las distintas familias
     private JTable tabla;
+    //----------- Socket cliente
+    private Socket cliente;
+    private ObjectOutputStream out;
+    private ArrayList info;
 
     //---------- CONSTRUCTOR
     /**
@@ -54,6 +63,13 @@ public class TPVJFrame extends JFrame {
         super("TPV");
         crearVentana();
         setVisible(true);
+        this.info = new ArrayList();
+        try {
+            this.cliente = new Socket("192.168.1.130", 65000);
+            this.out = new ObjectOutputStream(this.cliente.getOutputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //----------METODOS
@@ -294,23 +310,28 @@ public class TPVJFrame extends JFrame {
         int cantidad = 1;
         float total = precio;
         if (listaPedidos.containsKey(nombre)) {
-            if(nombre.equals(nombre)){
+            if (nombre.equals(nombre)) {
                 total = listaPedidos.get(nombre).getTotal() + precio;
             }
             cantidad = listaPedidos.get(nombre).getCantidad() + 1;
         }
         ProductoPedido nuevoPedido;
-        if(nombre.equals("Otros")){
-            nuevoPedido= new ProductoOtros(nombre, precio, cantidad, total);
-        }
-        else{
+        if (nombre.equals("Otros")) {
+            nuevoPedido = new ProductoOtros(nombre, precio, cantidad, total);
+        } else {
             nuevoPedido = new ProductoPedido(nombre, precio, cantidad);
         }
         listaPedidos.put(nombre, nuevoPedido);
         actualizarTabla();
         actualizarTotal();
+        //mandarInfo();
     }
 
+    /**
+     * Método que borra la tabla para rellenarla nuevamente con los datos
+     * actualizados de la compra.
+     *
+     */
     public void actualizarTabla() {
 
         int a = modeloTabla.getRowCount() - 1;
@@ -323,15 +344,39 @@ public class TPVJFrame extends JFrame {
         }
     }
 
+    /**
+     * Método que suma el gasto en cada producto mostrando el total de la
+     * compra.
+     *
+     */
     public void actualizarTotal() {
         float total = 0;
         for (String string : listaPedidos.keySet()) {
             total += listaPedidos.get(string).getTotal();
         }
-        String val = total +"";
+        String val = total + "";
         BigDecimal big = new BigDecimal(val);
         big = big.setScale(2, RoundingMode.HALF_UP);
         jLabelTotal.setText("" + big);
+    }
+
+    public void mandarInfo() {
+        if (!this.getInfo().isEmpty()) {
+            this.getInfo().clear();
+        }
+
+        this.getInfo().add(modeloTabla);
+        this.getInfo().add(jLabelTotal);
+
+        try {
+
+            out.writeObject(this.getInfo());
+            out.flush();
+
+        } catch (IOException ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private void eliminar() {
@@ -342,12 +387,39 @@ public class TPVJFrame extends JFrame {
         actualizarTabla();
         actualizarTotal();
     }
-    
-    private void crearCalculadora (){
+
+    private void crearCalculadora() {
         Calculadora calculadora = new Calculadora(this);
     }
 
     public static void main(String[] args) {
         TPVJFrame ventana = new TPVJFrame();
     }
+
+//*****************************************************************************
+//Getters & Setters
+    public Socket getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Socket cliente) {
+        this.cliente = cliente;
+    }
+
+    public ObjectOutputStream getOut() {
+        return out;
+    }
+
+    public void setOut(ObjectOutputStream out) {
+        this.out = out;
+    }
+
+    public ArrayList getInfo() {
+        return info;
+    }
+
+    public void setInfo(ArrayList info) {
+        this.info = info;
+    }
+
 }

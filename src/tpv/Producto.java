@@ -18,7 +18,7 @@ public class Producto extends JButton {
 	//----------CAMPOS
 	private final String nombre;    // Nombre del producto con el que se identificara en la factura
 	private final float precio;     // Precio unitario del producto.
-	private int unidadesStock;      // Sin implementar - Pra llevar un contro de existencias. 
+	private int unidadesStock;      // Sin implementar - Para llevar un contro de existencias. 
 	private TPVJFrame tpv;          // El TPV al que pertenece el producto 
 
         //----------CONSTRUCTORES
@@ -65,6 +65,7 @@ public class Producto extends JButton {
 		tpv.añadirAFactura(producto.getNombre(), producto.getPrecio());
 		actualizarTabla();
 		actualizarTotal();
+                tpv.mandarInfo();
 	}
 	
 	/**
