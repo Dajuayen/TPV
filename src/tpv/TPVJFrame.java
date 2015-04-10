@@ -134,11 +134,13 @@ public class TPVJFrame extends JFrame {
                     getInfo().getLineas().clear();
                     Vector vacio = new Vector();
                     getInfo().getLineas().put(-1, vacio);
+
+                    getOut().writeUnshared(getInfo());
+                    getOut().flush();
                     
-                    mandarInfo();
-                    
+
                     getOut().close();
-                    getCliente().close();                    
+                    getCliente().close();
 
                     System.exit(0);
 

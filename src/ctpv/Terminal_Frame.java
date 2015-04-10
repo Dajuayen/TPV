@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package ctpv;
 
 import javax.swing.table.DefaultTableModel;
@@ -15,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 public class Terminal_Frame extends javax.swing.JInternalFrame {
 
     private DefaultTableModel modeloTabla; //Modelo de la tabla que contiene la factura
+
     /**
      * Creates new form venta
      */
@@ -31,11 +31,25 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         this.jLabelFinal.setVisible(false);
     }
 
-    public void reset (){
-        this.jTableLineasCompra.setModel(modeloTabla);// Añadimos el modelo a la tabla
-        this.jLabelFinal.setText("€");
+    public boolean vaciar() {
+        if (this.modeloTabla.getRowCount() > 0) {
+            int a = modeloTabla.getRowCount() - 1;
+            for (int i = a; i >= 0; i--) {
+                modeloTabla.removeRow(i);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void reset() {
+
+        vaciar();
+        this.jLabelTotal.setText("€");
         this.setVisible(false);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -130,7 +144,6 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
 //*******************************************************************************
 //GETTERS & SETTERS
-
     public javax.swing.JLabel getjLabelFinal() {
         return jLabelFinal;
     }
@@ -162,6 +175,5 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
     public void setModeloTabla(DefaultTableModel modeloTabla) {
         this.modeloTabla = modeloTabla;
     }
-    
-    
+
 }

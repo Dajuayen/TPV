@@ -126,6 +126,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
         if (posicion != -1) {
             aux = lista[posicion];
         }
+        aux.reset();
         return aux;
     }
 
