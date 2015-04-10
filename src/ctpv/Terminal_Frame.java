@@ -28,9 +28,13 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         this.modeloTabla.addColumn("Sub-total");
 
         this.jTableLineasCompra.setModel(modeloTabla);// Añadimos el modelo a la tabla
-        
+        this.jLabelFinal.setVisible(false);
     }
 
+    public void reset (){
+        this.jTableLineasCompra.setModel(modeloTabla);// Añadimos el modelo a la tabla
+        this.jLabelFinal.setVisible(false);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -52,9 +56,10 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
         jLabel2.setText("Total ticket");
 
+        jLabelTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelTotal.setText("jLabel3");
 
-        jLabelFinal.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelFinal.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabelFinal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelFinal.setText("CLIENTE SERVIDO");
         jLabelFinal.setEnabled(false);
@@ -81,10 +86,10 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 49, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addGap(114, 114, 114))
                     .addComponent(jLabelTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

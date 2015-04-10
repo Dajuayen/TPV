@@ -5,6 +5,7 @@
  */
 package tpv;
 
+import datos.Info;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -53,17 +54,19 @@ public class TPVJFrame extends JFrame {
     //----------- Socket cliente
     private Socket cliente;
     private ObjectOutputStream out;
-    private ArrayList info;
+    private Info info;
 
     //---------- CONSTRUCTOR
     /**
-     * Crea una vista del TPV, iniciando toddos sus componentes.
+     * Crea una vista del TPV, iniciando todos sus componentes.
      */
     public TPVJFrame() {
         super("TPV");
+        //this.setUndecorated(true);
         crearVentana();
+        
         setVisible(true);
-        this.info = new ArrayList();
+        this.info = new Info();
         try {
             this.cliente = new Socket("192.168.1.130", 65000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
@@ -126,7 +129,13 @@ public class TPVJFrame extends JFrame {
         jButtonSalir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.exit(0);
+                try {
+                    getOut().close();
+                    getCliente().close();
+                    System.exit(0);
+                } catch (IOException ex) {
+                    Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         jPanelIzquierdo.add(jButtonSalir);
@@ -306,7 +315,7 @@ public class TPVJFrame extends JFrame {
      * @param nombre Nombre del producto seleccionado
      * @param precio Precio de producto
      */
-    public void añadirAFactura(String nombre, float precio) {
+    public void insertarAFactura(String nombre, float precio) {
         int cantidad = 1;
         float total = precio;
         if (listaPedidos.containsKey(nombre)) {
@@ -361,17 +370,17 @@ public class TPVJFrame extends JFrame {
     }
 
     public void mandarInfo() {
-        if (!this.getInfo().isEmpty()) {
-            this.getInfo().clear();
+        if (this.getInfo().size()>0) {
+            this.getInfo().vaciar();
         }
 
-        this.getInfo().add(modeloTabla);
-        this.getInfo().add(jLabelTotal);
+        this.getInfo().rellenaDatos(jLabelTotal, modeloTabla);
+        
 
         try {
 
             out.writeObject(this.getInfo());
-            out.flush();
+            //out.flush();
 
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -396,6 +405,7 @@ public class TPVJFrame extends JFrame {
         TPVJFrame ventana = new TPVJFrame();
     }
 
+    
 //*****************************************************************************
 //Getters & Setters
     public Socket getCliente() {
@@ -414,12 +424,14 @@ public class TPVJFrame extends JFrame {
         this.out = out;
     }
 
-    public ArrayList getInfo() {
+    public Info getInfo() {
         return info;
     }
 
-    public void setInfo(ArrayList info) {
+    public void setInfo(Info info) {
         this.info = info;
     }
+
+   
 
 }

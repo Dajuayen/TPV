@@ -5,6 +5,7 @@
  */
 package ctpv;
 
+import datos.Info;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -50,22 +51,24 @@ public class Venta extends Thread {
         try {
             
             
-            while (this.getMiSocket().isConnected()) {
-                
-                
+            //while (this.getMiSocket().isConnected()) {
+            while (true) {
+               // if (!this.getMiSocket().isClosed()) {
                 Object obj = this.getIn().readObject();
                 System.out.println("entro");
                 
                 rellenarTerminal(obj);
-                //this.getIn().close();
+              
                 this.terminal.repaint();
-
-               // this.getIn().close();
+//                }else
+//                    this.getTerminal().getjLabelFinal().setVisible(true);
+//                    Thread.sleep(3000);
+//                    
+//                    this.getTerminal().reset();
+//                    break;
             }
 
-        } catch (IOException ex) {
-            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -85,31 +88,37 @@ public class Venta extends Thread {
      * @return
      */
     private void rellenarTerminal(Object obj) {
-        ArrayList aux = (ArrayList) obj;
-
-        DefaultTableModel modeloTabla = (DefaultTableModel) aux.get(0); //Modelo de la tabla que contiene la factura
+        Info aux = (Info) obj;
+        Vector vTotal = aux.getLineas().get(0);
+        JLabel total = (JLabel) vTotal.elementAt(0);
+        this.getTerminal().getjLabelTotal().setText(total.getText());
+        
+        //DefaultTableModel modeloTabla = (DefaultTableModel) aux.get(0); //Modelo de la tabla que contiene la factura
+        
         //Borramos los datos de la tabla
         if (this.getTerminal().getModeloTabla().getRowCount() != 0) {
             for (int i = 0; i < this.getTerminal().getModeloTabla().getRowCount(); i++) {
                 this.getTerminal().getModeloTabla().removeRow(i);
             }
         }
+        
+    
+        
         //Recorremos los datos de la tabla origen y los copiamos a la de destino
-        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            for (int j = 0; j < 3; j++) {
-                String contenido = (String) modeloTabla.getValueAt(1, j);
-                System.out.println(contenido);
-                this.getTerminal().getModeloTabla().setValueAt(contenido, i, j);
-            }
+        for (int i = 1; i < aux.size(); i++) {
+            
+                Vector linea = (Vector) aux.getLineas().get(i);
+                
+                System.out.println(linea.toString());
+                
+                this.getTerminal().getModeloTabla().addRow(linea);
+                
             
         }
-            
-            
-            
-       // this.getTerminal().getModeloTabla().setDataVector(modeloTabla.getDataVector(), this.getColumnas());
-
-        JLabel total = (JLabel) aux.get(1);
-        this.getTerminal().getjLabelTotal().setText(total.getText());
+        this.getTerminal().getjTableLineasCompra().removeAll();
+        this.getTerminal().getjTableLineasCompra().setModel(this.getTerminal().getModeloTabla());
+        this.getTerminal().getjTableLineasCompra().repaint();
+        
     }
 //*******************************************************************************
 //GETTERS & SETTERS

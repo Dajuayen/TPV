@@ -103,7 +103,7 @@ public class Calculadora extends JFrame {
             try {
                 Float cantidad;
                 cantidad = Float.parseFloat(cadena);
-                tpv.añadirAFactura("Otros", cantidad);
+                tpv.insertarAFactura("Otros", cantidad);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "El preico no se indico de forma correcta",
                         "Precio incorrecto", JOptionPane.ERROR_MESSAGE);

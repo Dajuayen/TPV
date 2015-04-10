@@ -62,7 +62,7 @@ public class Producto extends JButton {
          * @param producto El producto a añadir a la factura 
          */
 	public void añadirAFactura(Producto producto) {
-		tpv.añadirAFactura(producto.getNombre(), producto.getPrecio());
+		tpv.insertarAFactura(producto.getNombre(), producto.getPrecio());
 		actualizarTabla();
 		actualizarTotal();
                 tpv.mandarInfo();
