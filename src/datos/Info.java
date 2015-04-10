@@ -26,11 +26,14 @@ public class Info implements Serializable{
     }
 
     public void rellenaDatos (JLabel label, DefaultTableModel modeloTabla ){
+        System.out.println("Entramos a rellenar datos");
         Vector total = new Vector();
         total.add(label);
         this.getLineas().put(0, total);
         for (int i = 0; i<modeloTabla.getRowCount();i++){
+             System.out.println(i);
             this.getLineas().put(i+1, (Vector) modeloTabla.getDataVector().elementAt(i));
+             System.out.println(modeloTabla.getDataVector().elementAt(i).toString());
         }
     }
    
@@ -40,6 +43,8 @@ public class Info implements Serializable{
     public void vaciar (){
         this.getLineas().clear();
     }
+
+   
     
     public HashMap<Integer, Vector> getLineas() {
         return lineas;

@@ -372,6 +372,7 @@ public class TPVJFrame extends JFrame {
     public void mandarInfo() {
         if (this.getInfo().size()>0) {
             this.getInfo().vaciar();
+            System.out.println("Ha vaciado los datos de info");
         }
 
         this.getInfo().rellenaDatos(jLabelTotal, modeloTabla);
@@ -379,8 +380,9 @@ public class TPVJFrame extends JFrame {
 
         try {
 
+            System.out.println("Tamaño de lo mandado = "+this.getInfo().size());
             out.writeObject(this.getInfo());
-            //out.flush();
+            out.flush();
 
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);

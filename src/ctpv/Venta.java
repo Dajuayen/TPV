@@ -9,12 +9,10 @@ import datos.Info;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -89,6 +87,7 @@ public class Venta extends Thread {
      */
     private void rellenarTerminal(Object obj) {
         Info aux = (Info) obj;
+        System.out.println("Tamaño de lo recibido = "+ aux.size());
         Vector vTotal = aux.getLineas().get(0);
         JLabel total = (JLabel) vTotal.elementAt(0);
         this.getTerminal().getjLabelTotal().setText(total.getText());
