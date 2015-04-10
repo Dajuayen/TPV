@@ -37,13 +37,6 @@ public class Info implements Serializable{
         }
     }
    
-    public int size (){
-        return this.getLineas().size();
-    }
-    public void vaciar (){
-        this.getLineas().clear();
-    }
-
    
     
     public HashMap<Integer, Vector> getLineas() {

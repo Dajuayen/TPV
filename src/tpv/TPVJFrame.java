@@ -20,6 +20,7 @@ import java.math.RoundingMode;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -130,9 +131,17 @@ public class TPVJFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 try {
+                    getInfo().getLineas().clear();
+                    Vector vacio = new Vector();
+                    getInfo().getLineas().put(-1, vacio);
+                    
+                    mandarInfo();
+                    
                     getOut().close();
-                    getCliente().close();
+                    getCliente().close();                    
+
                     System.exit(0);
+
                 } catch (IOException ex) {
                     Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -333,7 +342,7 @@ public class TPVJFrame extends JFrame {
         listaPedidos.put(nombre, nuevoPedido);
         actualizarTabla();
         actualizarTotal();
-        //mandarInfo();
+        mandarInfo();
     }
 
     /**
@@ -370,22 +379,20 @@ public class TPVJFrame extends JFrame {
     }
 
     public void mandarInfo() {
-        if (this.getInfo().size() > 0) {
-            this.getInfo().vaciar();
+        if (this.getInfo().getLineas().size() > 0) {
+            this.getInfo().getLineas().clear();
             System.out.println("Ha vaciado los datos de info");
         }
 
         this.getInfo().rellenaDatos(jLabelTotal, modeloTabla);
 
         try {
-            
-            
-            System.out.println("Tamaño de lo mandado = " + this.getInfo().size());
+
+            System.out.println("Tamaño de lo mandado = " + this.getInfo().getLineas().size());
             //this.getOut().writeObject(this.getInfo());
             this.getOut().writeUnshared(this.getInfo());
             this.getOut().flush();
             this.getOut().reset();
-            
 
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -400,6 +407,7 @@ public class TPVJFrame extends JFrame {
         }
         actualizarTabla();
         actualizarTotal();
+        mandarInfo();
     }
 
     private void crearCalculadora() {

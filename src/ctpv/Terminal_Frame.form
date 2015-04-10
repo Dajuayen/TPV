@@ -79,7 +79,7 @@
     <Component class="javax.swing.JLabel" name="jLabelTotal">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="jLabel3"/>
+        <Property name="text" type="java.lang.String" value="&#x20ac;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabelFinal">

@@ -33,7 +33,8 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
     public void reset (){
         this.jTableLineasCompra.setModel(modeloTabla);// Añadimos el modelo a la tabla
-        this.jLabelFinal.setVisible(false);
+        this.jLabelFinal.setText("€");
+        this.setVisible(false);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -57,7 +58,7 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         jLabel2.setText("Total ticket");
 
         jLabelTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelTotal.setText("jLabel3");
+        jLabelTotal.setText("€");
 
         jLabelFinal.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabelFinal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

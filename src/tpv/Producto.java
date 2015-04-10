@@ -65,7 +65,7 @@ public class Producto extends JButton {
 		tpv.insertarAFactura(producto.getNombre(), producto.getPrecio());
 		actualizarTabla();
 		actualizarTotal();
-                tpv.mandarInfo();
+                //tpv.mandarInfo();
 	}
 	
 	/**
