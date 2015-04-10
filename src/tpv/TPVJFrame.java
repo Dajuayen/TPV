@@ -64,7 +64,7 @@ public class TPVJFrame extends JFrame {
         super("TPV");
         //this.setUndecorated(true);
         crearVentana();
-        
+
         setVisible(true);
         this.info = new Info();
         try {
@@ -370,19 +370,22 @@ public class TPVJFrame extends JFrame {
     }
 
     public void mandarInfo() {
-        if (this.getInfo().size()>0) {
+        if (this.getInfo().size() > 0) {
             this.getInfo().vaciar();
             System.out.println("Ha vaciado los datos de info");
         }
 
         this.getInfo().rellenaDatos(jLabelTotal, modeloTabla);
-        
 
         try {
-
-            System.out.println("Tamaño de lo mandado = "+this.getInfo().size());
-            out.writeObject(this.getInfo());
-            out.flush();
+            
+            
+            System.out.println("Tamaño de lo mandado = " + this.getInfo().size());
+            //this.getOut().writeObject(this.getInfo());
+            this.getOut().writeUnshared(this.getInfo());
+            this.getOut().flush();
+            this.getOut().reset();
+            
 
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -407,7 +410,6 @@ public class TPVJFrame extends JFrame {
         TPVJFrame ventana = new TPVJFrame();
     }
 
-    
 //*****************************************************************************
 //Getters & Setters
     public Socket getCliente() {
@@ -433,7 +435,5 @@ public class TPVJFrame extends JFrame {
     public void setInfo(Info info) {
         this.info = info;
     }
-
-   
 
 }

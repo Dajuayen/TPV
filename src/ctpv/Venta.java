@@ -47,16 +47,16 @@ public class Venta extends Thread {
     @Override
     public void run() {
         try {
-            
-            
+
             //while (this.getMiSocket().isConnected()) {
             while (true) {
-               // if (!this.getMiSocket().isClosed()) {
+                // if (!this.getMiSocket().isClosed()) {
                 Object obj = this.getIn().readObject();
                 System.out.println("entro");
-                
+
                 rellenarTerminal(obj);
-              
+
+                //this.getIn().reset();
                 this.terminal.repaint();
 //                }else
 //                    this.getTerminal().getjLabelFinal().setVisible(true);
@@ -87,37 +87,34 @@ public class Venta extends Thread {
      */
     private void rellenarTerminal(Object obj) {
         Info aux = (Info) obj;
-        System.out.println("Tamaño de lo recibido = "+ aux.size());
+        System.out.println("Tamaño de lo recibido = " + aux.size());
         Vector vTotal = aux.getLineas().get(0);
         JLabel total = (JLabel) vTotal.elementAt(0);
         this.getTerminal().getjLabelTotal().setText(total.getText());
-        
+
         //DefaultTableModel modeloTabla = (DefaultTableModel) aux.get(0); //Modelo de la tabla que contiene la factura
-        
-        //Borramos los datos de la tabla
+        //Borramos los datos de la tabla       
         if (this.getTerminal().getModeloTabla().getRowCount() != 0) {
-            for (int i = 0; i < this.getTerminal().getModeloTabla().getRowCount(); i++) {
+            int a = this.getTerminal().getModeloTabla().getRowCount() - 1;
+            for (int i = a; i >= 0; i--) {
                 this.getTerminal().getModeloTabla().removeRow(i);
             }
         }
-        
-    
-        
+
         //Recorremos los datos de la tabla origen y los copiamos a la de destino
         for (int i = 1; i < aux.size(); i++) {
-            
-                Vector linea = (Vector) aux.getLineas().get(i);
-                
-                System.out.println(linea.toString());
-                
-                this.getTerminal().getModeloTabla().addRow(linea);
-                
-            
+
+            Vector linea = (Vector) aux.getLineas().get(i);
+
+            System.out.println(linea.toString());
+
+            this.getTerminal().getModeloTabla().addRow(linea);
+
         }
         this.getTerminal().getjTableLineasCompra().removeAll();
         this.getTerminal().getjTableLineasCompra().setModel(this.getTerminal().getModeloTabla());
         this.getTerminal().getjTableLineasCompra().repaint();
-        
+
     }
 //*******************************************************************************
 //GETTERS & SETTERS
@@ -146,5 +143,4 @@ public class Venta extends Thread {
         return miSocket;
     }
 
-    
 }
