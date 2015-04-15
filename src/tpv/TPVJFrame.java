@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
@@ -71,6 +72,9 @@ public class TPVJFrame extends JFrame {
         try {
             this.cliente = new Socket("192.168.1.130", 65000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
+            DataInputStream in = new DataInputStream(this.cliente.getInputStream());
+            String titulo = in.readUTF();
+            setTitle(titulo);
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

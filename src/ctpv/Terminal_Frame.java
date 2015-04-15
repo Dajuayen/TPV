@@ -47,6 +47,7 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
         vaciar();
         this.jLabelTotal.setText("€");
+        this.jLabelFinal.setVisible(false);
         this.setVisible(false);
     }
 

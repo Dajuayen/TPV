@@ -30,13 +30,20 @@ public class CTPV_Frame extends javax.swing.JFrame {
     public CTPV_Frame() {
         initComponents();
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
+
         this.terminal1 = new Terminal_Frame();
+        this.terminal1.setTitle("TERMINAL Nº1");
         this.terminal2 = new Terminal_Frame();
+        this.terminal2.setTitle("TERMINAL Nº2");
         this.terminal3 = new Terminal_Frame();
+        this.terminal3.setTitle("TERMINAL Nº3");
         this.terminal4 = new Terminal_Frame();
+        this.terminal4.setTitle("TERMINAL Nº4");
         this.terminal5 = new Terminal_Frame();
+        this.terminal5.setTitle("TERMINAL Nº5");
         this.terminal6 = new Terminal_Frame();
+        this.terminal6.setTitle("TERMINAL Nº6");
+        
         this.getContentPane().add(terminal1, 0);
         this.getContentPane().add(terminal2, 1);
         this.getContentPane().add(terminal3, 2);

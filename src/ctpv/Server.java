@@ -6,6 +6,7 @@
 
 package ctpv;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,6 +37,10 @@ public class Server implements Runnable {
                 Socket socket = this.getServidor().accept();
                 
                 Venta cliente = new Venta(socket, this.getApp().devuelveTerminal());
+                
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF(cliente.getTerminal().getTitle());
+                
                 cliente.start();
                 
                 this.getApp().repaint();
