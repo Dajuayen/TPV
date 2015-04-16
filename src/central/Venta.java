@@ -21,13 +21,15 @@ import javax.swing.JLabel;
 public class Venta extends Thread {
 
     private Vector columnas;
+    private CTPV_Frame app;
     private Terminal_Frame terminal;
 
     private Socket miSocket;
     private ObjectInputStream in;
 
-    public Venta(Socket miSocket, Terminal_Frame terminal) {
-        this.terminal = terminal;
+    public Venta(Socket miSocket, CTPV_Frame app, int index) {
+        this.app = app;
+        this.terminal = app.getLista()[index];
         this.terminal.setVisible(true);
 
         this.miSocket = miSocket;
@@ -63,6 +65,7 @@ public class Venta extends Thread {
                     this.getTerminal().getjLabelFinal().setVisible(true);
                     Thread.sleep(3000);
                     this.getTerminal().reset();
+                    this.getApp().borrarTerminal(getTerminal());
                 }
 
             }
@@ -99,10 +102,11 @@ public class Venta extends Thread {
         if (aux.getLineas().containsKey(-1)) {
             b = false;
         } else {
-            System.out.println("Tamaño de lo recibido = " + aux.getLineas().size());
+         
             //Borramos los datos del terminal      
             this.getTerminal().vaciar();
           
+            //En el indice 0 del objeto dato esta la label con el total de la factura
             Vector vTotal = aux.getLineas().get(0);
             JLabel total = (JLabel) vTotal.elementAt(0);
             this.getTerminal().getjLabelTotal().setText(total.getText() + " €");
@@ -117,6 +121,7 @@ public class Venta extends Thread {
                 this.getTerminal().getModeloTabla().addRow(linea);
 
             }
+            
             this.getTerminal().getjTableLineasCompra().removeAll();
             this.getTerminal().getjTableLineasCompra().setModel(this.getTerminal().getModeloTabla());
             this.getTerminal().getjTableLineasCompra().repaint();
@@ -151,5 +156,15 @@ public class Venta extends Thread {
     public Socket getMiSocket() {
         return miSocket;
     }
+
+    public CTPV_Frame getApp() {
+        return app;
+    }
+
+    public void setApp(CTPV_Frame app) {
+        this.app = app;
+    }
+    
+    
 
 }

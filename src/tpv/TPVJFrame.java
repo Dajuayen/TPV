@@ -66,15 +66,21 @@ public class TPVJFrame extends JFrame {
         super("TPV");
         //this.setUndecorated(true);
         crearVentana();
-
-        setVisible(true);
+        
         this.info = new Info();
+        
         try {
-            this.cliente = new Socket("192.168.1.130", 65000);
+            this.cliente = new Socket("localhost", 65000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
             DataInputStream in = new DataInputStream(this.cliente.getInputStream());
             String titulo = in.readUTF();
-            setTitle(titulo);
+            if (titulo.equals("ocupado")) {
+                System.out.println("Terminal no conectado a CTPV y finalizado");
+                System.exit(0);
+            } else {
+                setTitle(titulo);
+                setVisible(true);
+            }
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -141,7 +147,6 @@ public class TPVJFrame extends JFrame {
 
                     getOut().writeUnshared(getInfo());
                     getOut().flush();
-                    
 
                     getOut().close();
                     getCliente().close();

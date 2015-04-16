@@ -137,11 +137,14 @@ public class CTPV_Frame extends javax.swing.JFrame {
     public boolean borrarTerminal(Terminal_Frame terminal) {
         boolean hecho = false;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i <6 ; i++) {
+            
             if (this.lista[i] == terminal) {
                 this.lista[i] = null;
                 this.remove(terminal);
+                this.repaint();
                 hecho = true;
+                break;
             }
         }
 
@@ -149,6 +152,14 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
     }
 
+//    private void repintar(){
+//        this.removeAll();
+//        for (int i = 0; i < 6; i++) {
+//            this.add(this.lista[i]);
+//        }
+//        this.repaint();
+//    }
+    
 //    public Terminal_Frame devuelveTerminal() {
 //        Terminal_Frame aux = null;
 //        int posicion = primeroLibre();
