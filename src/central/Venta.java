@@ -6,6 +6,7 @@
 package central;
 
 import datos.Info;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -27,6 +28,9 @@ public class Venta extends Thread {
     private Socket miSocket;
     private ObjectInputStream in;
 
+    private Facturacion facturacion;
+    private final File FICHERO = new File("Ventas.dat");
+
     public Venta(Socket miSocket, CTPV_Frame app, int index) {
         this.app = app;
         this.terminal = app.getLista()[index];
@@ -38,7 +42,11 @@ public class Venta extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        try {
+            this.facturacion = new Facturacion(FICHERO, this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal());
+        } catch (IOException ex) {
+            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.columnas = new Vector();
         this.columnas.addElement("Productos");
         this.columnas.addElement("Cantidad");
@@ -60,30 +68,30 @@ public class Venta extends Thread {
                 if (rellenarTerminal(obj)) {
                     this.terminal.repaint();
                 } else {
-                    this.getIn().close();
-                    this.getMiSocket().close();
-                    this.getTerminal().getjLabelFinal().setVisible(true);
-                    Thread.sleep(3000);
-                    this.getTerminal().reset();
-                    this.getApp().borrarTerminal(getTerminal());
+//                    this.getIn().close();
+//                    this.getMiSocket().close();
+//                    this.getTerminal().getjLabelFinal().setVisible(true);
+//                    Thread.sleep(3000);
+                    this.getFacturacion().rellenarFactura();
+                    this.getFacturacion().guardarFactura();
+                    this.getTerminal().compraFinalizada();
+//                    this.getTerminal().reset();
+//                    this.getApp().borrarTerminal(getTerminal());
                 }
 
             }
-            
-        }catch (InterruptedException ex) {
-            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
+
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 this.getIn().close();
                 this.getMiSocket().close();
-                this.getTerminal().getjLabelFinal().setVisible(true);
-                Thread.sleep(3000);
+                //this.getTerminal().compraFinalizada();
+                // Thread.sleep(3000);
                 this.getTerminal().reset();
+                this.getApp().borrarTerminal(getTerminal());
             } catch (IOException ex) {
-                Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
                 Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -102,15 +110,15 @@ public class Venta extends Thread {
         if (aux.getLineas().containsKey(-1)) {
             b = false;
         } else {
-         
+
             //Borramos los datos del terminal      
             this.getTerminal().vaciar();
-          
+
             //En el indice 0 del objeto dato esta la label con el total de la factura
             Vector vTotal = aux.getLineas().get(0);
             JLabel total = (JLabel) vTotal.elementAt(0);
             this.getTerminal().getjLabelTotal().setText(total.getText() + " €");
-            
+
             //Recorremos los datos de la tabla origen y los copiamos a la de destino
             for (int i = 1; i < aux.getLineas().size(); i++) {
 
@@ -121,7 +129,7 @@ public class Venta extends Thread {
                 this.getTerminal().getModeloTabla().addRow(linea);
 
             }
-            
+
             this.getTerminal().getjTableLineasCompra().removeAll();
             this.getTerminal().getjTableLineasCompra().setModel(this.getTerminal().getModeloTabla());
             this.getTerminal().getjTableLineasCompra().repaint();
@@ -164,7 +172,14 @@ public class Venta extends Thread {
     public void setApp(CTPV_Frame app) {
         this.app = app;
     }
-    
-    
 
+    public Facturacion getFacturacion() {
+        return facturacion;
+    }
+
+    public void setFacturacion(Facturacion facturacion) {
+        this.facturacion = facturacion;
+    }
+
+    
 }

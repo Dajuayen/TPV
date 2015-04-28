@@ -13,6 +13,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -66,9 +68,9 @@ public class TPVJFrame extends JFrame {
         super("TPV");
         //this.setUndecorated(true);
         crearVentana();
-        
+
         this.info = new Info();
-        
+
         try {
             this.cliente = new Socket("localhost", 65000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
@@ -140,22 +142,7 @@ public class TPVJFrame extends JFrame {
         jButtonSalir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                try {
-                    getInfo().getLineas().clear();
-                    Vector vacio = new Vector();
-                    getInfo().getLineas().put(-1, vacio);
-
-                    getOut().writeUnshared(getInfo());
-                    getOut().flush();
-
-                    getOut().close();
-                    getCliente().close();
-
-                    System.exit(0);
-
-                } catch (IOException ex) {
-                    Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                salir();
             }
         });
         jPanelIzquierdo.add(jButtonSalir);
@@ -222,6 +209,12 @@ public class TPVJFrame extends JFrame {
             }
         });
         jPanelDerecho.add(jButtonTotal);
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                salir();
+            }
+        });
 
         jPanelEncabezado.add(jPanelIzquierdo, BorderLayout.WEST);
         jPanelEncabezado.add(jPanelDerecho, BorderLayout.EAST);
@@ -429,8 +422,31 @@ public class TPVJFrame extends JFrame {
         TPVJFrame ventana = new TPVJFrame();
     }
 
+    /**
+     * Método que se encarga de enviar los datos con la información predeterminada para
+     * que el servidor sepa que el objeto TPVJFrame concreto va a cerrarse
+     */
+    private void salir() {
+        try {
+            getInfo().getLineas().clear();
+            Vector vacio = new Vector();
+            getInfo().getLineas().put(-1, vacio);
+
+            getOut().writeUnshared(getInfo());
+            getOut().flush();
+
+            getOut().close();
+            getCliente().close();
+
+            System.exit(0);
+
+        } catch (IOException ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 //*****************************************************************************
 //Getters & Setters
+
     public Socket getCliente() {
         return cliente;
     }

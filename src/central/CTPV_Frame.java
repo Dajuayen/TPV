@@ -5,6 +5,7 @@
  */
 package central;
 
+import java.io.File;
 import javax.swing.JFrame;
 
 /**
@@ -22,6 +23,8 @@ public class CTPV_Frame extends javax.swing.JFrame {
     private Terminal_Frame[] lista;
 
     private Thread servidor;
+    
+    private File facturacion;
 
     /**
      * Creates new form CTPV_Frame
@@ -59,6 +62,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
         this.servidor = new Thread(new Server(this));
         this.servidor.start();
+        
+        this.facturacion = new File("Ventas.dat");
+                
     }
 
     /**
@@ -70,12 +76,35 @@ public class CTPV_Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDesktopPanel = new javax.swing.JDesktopPane();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CTPV");
-        getContentPane().setLayout(new java.awt.GridLayout(2, 3));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                prueba(evt);
+            }
+        });
+
+        jDesktopPanel.setLayout(new java.awt.GridLayout(2, 3));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jDesktopPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 676, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jDesktopPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void prueba(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_prueba
+        // TODO add your handling code here:
+    }//GEN-LAST:event_prueba
 
     /**
      * @param args the command line arguments
@@ -125,15 +154,28 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
     }
 
+    /**
+     * Método que inserta el terminal que recibe como parametro en el panel contenedor del frame
+     * 
+     * @param terminal 
+     */
     public void insertarTerminal(Terminal_Frame terminal) {
         int i = primeroLibre();
 
-        this.add(terminal);
+        this.jDesktopPanel.add(terminal);
+        
         terminal.setVisible(true);
 
         this.lista[i] = terminal;
     }
 
+    /**
+     * Método que borra del panel contenedor del frame el Terminal_frame que recibe como parametro
+     * y devuelve true si lleva a cabo la operación y false si no se lleva a cabo.
+     * 
+     * @param terminal
+     * @return boolean
+     */
     public boolean borrarTerminal(Terminal_Frame terminal) {
         boolean hecho = false;
 
@@ -141,7 +183,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
             
             if (this.lista[i] == terminal) {
                 this.lista[i] = null;
-                this.remove(terminal);
+                this.jDesktopPanel.setVisible(false);
+                this.jDesktopPanel.remove(terminal);
+                this.jDesktopPanel.setVisible(true);
                 this.repaint();
                 hecho = true;
                 break;
@@ -171,6 +215,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDesktopPane jDesktopPanel;
     // End of variables declaration//GEN-END:variables
     public Terminal_Frame[] getLista() {
         return lista;
@@ -188,4 +233,18 @@ public class CTPV_Frame extends javax.swing.JFrame {
         this.servidor = servidor;
     }
 
+    public javax.swing.JDesktopPane getjDesktopPanel() {
+        return jDesktopPanel;
+    }
+
+    public void setjDesktopPanel(javax.swing.JDesktopPane jDesktopPanel) {
+        this.jDesktopPanel = jDesktopPanel;
+    }
+
+    public File getFacturacion() {
+        return facturacion;
+    }
+
+    
+    
 }
