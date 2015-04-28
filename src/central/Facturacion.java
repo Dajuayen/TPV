@@ -6,6 +6,7 @@
 package central;
 
 import datos.Factura;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,60 +27,83 @@ import javax.swing.table.DefaultTableModel;
 public class Facturacion {
 
     private Factura factura;
-
     private File fichero;
-
     private TreeMap<Integer, Factura> registro;
-
-    private DefaultTableModel modeloTabla;
-
+    
     private JLabel total;
+    private StringBuilder linea;
 
-    public Facturacion(File fichero, DefaultTableModel modeloTabla, JLabel total) throws FileNotFoundException, IOException {
-        this.fichero = fichero;
-        this.modeloTabla = modeloTabla;
-        this.total = total;
-
+    public Facturacion(File fichero) throws FileNotFoundException, IOException {
+        this.fichero = fichero;             
+        this.registro = new TreeMap<Integer, Factura>();
+        this.linea = new StringBuilder();
         this.factura = new Factura();
-
     }
 
-    public void rellenarFactura() throws IOException {
+    public void rellenarFactura(DefaultTableModel modeloTabla, String total) throws IOException, ClassNotFoundException {
+
         //Introducimos primero los datos que ya tenemos
         this.getFactura().setFecha(new Date());
-        this.getFactura().setTotal(Integer.parseInt(this.getTotal().getText()));
-        //Recorremos el modeloTabla y vamos introduciendo los datos en las lineas de la factura
-        for (int i = 0; i < this.getModeloTabla().getRowCount(); i++) {
-            Vector vector = (Vector) this.getModeloTabla().getDataVector().get(i);
-            StringBuilder linea = new StringBuilder();
+        this.getFactura().setTotal(total);
+
+        //Recorremos el modeloTabla y vamos introduciendo los datos en las lineas de la factura        
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            if (linea.length() > 0) {
+                linea.delete(0, linea.length());
+            }
+            Vector vector = (Vector) modeloTabla.getDataVector().get(i);
             linea.append("" + (i + 1));
-            for (int j = 2; j < 3; j++) {
+            for (int j = 0; j < vector.size(); j++) {
                 linea.append("   ||   ");
                 linea.append(vector.get(j));
+                if (j == 0) {
+                    linea.setLength(40);
+                }
             }
-            this.getFactura().getLineas().add(linea);
+            System.out.println(linea.toString());
+            this.getFactura().getLineas().add(linea.toString());
+
         }
         //Introducimos el numero de la factura
-        this.getFactura().setNumFactura(leerFichero() + 1);
+        //leerFichero();
+        int num = 1 + this.getRegistro().size();
+        this.getFactura().setNumFactura(num);
 
     }
 
-    public int leerFichero() throws IOException {
+    public int leerFichero() throws IOException, ClassNotFoundException {
         int totalCompras = 0;
+        FileInputStream fileIn = null;
         ObjectInputStream in = null;
-        this.getRegistro().clear();
+
+        if (!this.getRegistro().isEmpty()) {
+            this.getRegistro().clear();
+        }
+
         try {
-            in = new ObjectInputStream(new FileInputStream(fichero));
+            System.out.println(this.getFichero().getName());
+            System.out.println(this.getFichero().getPath());
+            String file = fichero.getAbsolutePath();
+            System.out.println(file);
+            
+            fileIn = new FileInputStream(file);
+            in = new ObjectInputStream(fileIn);
+
             Factura aux = new Factura();
             while (true) {
                 aux = (Factura) in.readObject();
                 totalCompras++;
                 this.getRegistro().put(totalCompras, aux);
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (FileNotFoundException e) {
+            fileIn.close();
             in.close();
+            return totalCompras;
+        } catch (EOFException e) {
+            fileIn.close();
+            in.close();
+            return totalCompras;
         }
-        return totalCompras;
 
     }
 
@@ -104,22 +128,6 @@ public class Facturacion {
 
     public void setFichero(File fichero) {
         this.fichero = fichero;
-    }
-
-    public DefaultTableModel getModeloTabla() {
-        return modeloTabla;
-    }
-
-    public void setModeloTabla(DefaultTableModel modeloTabla) {
-        this.modeloTabla = modeloTabla;
-    }
-
-    public JLabel getTotal() {
-        return total;
-    }
-
-    public void setTotal(JLabel total) {
-        this.total = total;
     }
 
     public TreeMap<Integer, Factura> getRegistro() {

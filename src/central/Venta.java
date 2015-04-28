@@ -28,13 +28,12 @@ public class Venta extends Thread {
     private Socket miSocket;
     private ObjectInputStream in;
 
-    private Facturacion facturacion;
-    private final File FICHERO = new File("Ventas.dat");
+    
 
     public Venta(Socket miSocket, CTPV_Frame app, int index) {
         this.app = app;
         this.terminal = app.getLista()[index];
-        this.terminal.setVisible(true);
+        this.terminal.setVisible(true); 
 
         this.miSocket = miSocket;
         try {
@@ -42,11 +41,7 @@ public class Venta extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         }
-        try {
-            this.facturacion = new Facturacion(FICHERO, this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal());
-        } catch (IOException ex) {
-            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    
         this.columnas = new Vector();
         this.columnas.addElement("Productos");
         this.columnas.addElement("Cantidad");
@@ -69,11 +64,12 @@ public class Venta extends Thread {
                     this.terminal.repaint();
                 } else {
 //                    this.getIn().close();
-//                    this.getMiSocket().close();
+                    this.getMiSocket().close();
 //                    this.getTerminal().getjLabelFinal().setVisible(true);
 //                    Thread.sleep(3000);
-                    this.getFacturacion().rellenarFactura();
-                    this.getFacturacion().guardarFactura();
+                    this.getApp().getFacturacion().rellenarFactura(this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal().getText());
+//                    this.getFacturacion().rellenarFactura();
+                    this.getApp().getFacturacion().guardarFactura();
                     this.getTerminal().compraFinalizada();
 //                    this.getTerminal().reset();
 //                    this.getApp().borrarTerminal(getTerminal());
@@ -86,7 +82,7 @@ public class Venta extends Thread {
         } finally {
             try {
                 this.getIn().close();
-                this.getMiSocket().close();
+                if(!this.getMiSocket().isClosed())this.getMiSocket().close();
                 //this.getTerminal().compraFinalizada();
                 // Thread.sleep(3000);
                 this.getTerminal().reset();
@@ -172,14 +168,5 @@ public class Venta extends Thread {
     public void setApp(CTPV_Frame app) {
         this.app = app;
     }
-
-    public Facturacion getFacturacion() {
-        return facturacion;
-    }
-
-    public void setFacturacion(Facturacion facturacion) {
-        this.facturacion = facturacion;
-    }
-
     
 }

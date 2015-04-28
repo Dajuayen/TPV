@@ -6,6 +6,9 @@
 package central;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
@@ -23,8 +26,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
     private Terminal_Frame[] lista;
 
     private Thread servidor;
-    
-    private File facturacion;
+
+    private Facturacion facturacion;
+    private File fichero;
 
     /**
      * Creates new form CTPV_Frame
@@ -62,9 +66,17 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
         this.servidor = new Thread(new Server(this));
         this.servidor.start();
-        
-        this.facturacion = new File("Ventas.dat");
-                
+
+        this.fichero = new File("Ventas.dat");
+        try {
+
+            System.out.println(fichero.createNewFile());
+            this.facturacion = new Facturacion(fichero);
+        } catch (IOException ex) {
+            Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+ 
     }
 
     /**
@@ -155,32 +167,34 @@ public class CTPV_Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Método que inserta el terminal que recibe como parametro en el panel contenedor del frame
-     * 
-     * @param terminal 
+     * Método que inserta el terminal que recibe como parametro en el panel
+     * contenedor del frame
+     *
+     * @param terminal
      */
     public void insertarTerminal(Terminal_Frame terminal) {
         int i = primeroLibre();
 
         this.jDesktopPanel.add(terminal);
-        
+
         terminal.setVisible(true);
 
         this.lista[i] = terminal;
     }
 
     /**
-     * Método que borra del panel contenedor del frame el Terminal_frame que recibe como parametro
-     * y devuelve true si lleva a cabo la operación y false si no se lleva a cabo.
-     * 
+     * Método que borra del panel contenedor del frame el Terminal_frame que
+     * recibe como parametro y devuelve true si lleva a cabo la operación y
+     * false si no se lleva a cabo.
+     *
      * @param terminal
      * @return boolean
      */
     public boolean borrarTerminal(Terminal_Frame terminal) {
         boolean hecho = false;
 
-        for (int i = 0; i <6 ; i++) {
-            
+        for (int i = 0; i < 6; i++) {
+
             if (this.lista[i] == terminal) {
                 this.lista[i] = null;
                 this.jDesktopPanel.setVisible(false);
@@ -203,7 +217,6 @@ public class CTPV_Frame extends javax.swing.JFrame {
 //        }
 //        this.repaint();
 //    }
-    
 //    public Terminal_Frame devuelveTerminal() {
 //        Terminal_Frame aux = null;
 //        int posicion = primeroLibre();
@@ -241,10 +254,8 @@ public class CTPV_Frame extends javax.swing.JFrame {
         this.jDesktopPanel = jDesktopPanel;
     }
 
-    public File getFacturacion() {
+    public Facturacion getFacturacion() {
         return facturacion;
     }
 
-    
-    
 }

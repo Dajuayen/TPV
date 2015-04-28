@@ -17,14 +17,14 @@ public class Factura implements Serializable {
 
     private Date fecha;
     private int numFactura;
-    private ArrayList<StringBuilder> lineas;
-    private int total;
+    private ArrayList<String> lineas;
+    private String total;
 
-    public Factura(int numFactura, ArrayList<StringBuilder> lineas) {
+    public Factura(int numFactura, ArrayList<String> lineas) {
         this.fecha = new Date();
         this.numFactura = numFactura;
         this.lineas = lineas;
-        this.total = 0;
+        this.total = "";
     }
 
     public Factura() {
@@ -49,19 +49,19 @@ public class Factura implements Serializable {
         this.numFactura = numFactura;
     }
 
-    public int getTotal() {
+    public String getTotal() {
         return total;
     }
 
-    public void setTotal(int total) {
+    public void setTotal(String total) {
         this.total = total;
     }
 
-    public ArrayList<StringBuilder> getLineas() {
+    public ArrayList<String> getLineas() {
         return lineas;
     }
 
-    public void setLineas(ArrayList<StringBuilder> lineas) {
+    public void setLineas(ArrayList<String> lineas) {
         this.lineas = lineas;
     }
 
