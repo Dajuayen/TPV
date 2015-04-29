@@ -5,7 +5,6 @@
  */
 package central;
 
-import java.io.File;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -87,6 +86,8 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         jLabelTotal = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableLineasCompra = new javax.swing.JTable();
+
+        setIconifiable(true);
 
         jLabel1.setText("Ticket de compra");
 

@@ -17,7 +17,6 @@ import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.Vector;
-import javax.swing.JLabel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -26,25 +25,34 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Facturacion {
 
-    private Factura factura;
     private File fichero;
     private TreeMap<Integer, Factura> registro;
-    
-    private JLabel total;
-    private StringBuilder linea;
 
     public Facturacion(File fichero) throws FileNotFoundException, IOException {
-        this.fichero = fichero;             
+        this.fichero = fichero;
         this.registro = new TreeMap<Integer, Factura>();
-        this.linea = new StringBuilder();
-        this.factura = new Factura();
+       
+        
     }
 
-    public void rellenarFactura(DefaultTableModel modeloTabla, String total) throws IOException, ClassNotFoundException {
+    /**
+     * Método que recibiendo como parametros un DeFaultTableModel de una compra y un string con su total
+     * genera una Factura con la fecha actual del sistema, un número de factura, las distintas lineas de la compra
+     * sacadas del DefaultTableModel y el total.
+     * 
+     * @param modeloTabla
+     * @param total
+     * @return Factura
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public Factura rellenarFactura(DefaultTableModel modeloTabla, String total) throws IOException, ClassNotFoundException {
+        Factura aux = new Factura();
+        StringBuilder linea = new StringBuilder();
 
         //Introducimos primero los datos que ya tenemos
-        this.getFactura().setFecha(new Date());
-        this.getFactura().setTotal(total);
+        aux.setFecha(new Date());
+        aux.setTotal(total);
 
         //Recorremos el modeloTabla y vamos introduciendo los datos en las lineas de la factura        
         for (int i = 0; i < modeloTabla.getRowCount(); i++) {
@@ -61,14 +69,36 @@ public class Facturacion {
                 }
             }
             System.out.println(linea.toString());
-            this.getFactura().getLineas().add(linea.toString());
+            aux.getLineas().add(linea.toString());
 
         }
         //Introducimos el numero de la factura
         //leerFichero();
         int num = 1 + this.getRegistro().size();
-        this.getFactura().setNumFactura(num);
+        aux.setNumFactura(num);
 
+        return aux;
+
+    }
+
+    /**
+     * Método que recibe una Factura como parametro y la guarda tanto en la coleccion interna de la clase Facturación
+     * como en el fichero introducido en el atributo fichero.
+     * 
+     * @param factura
+     * @throws IOException 
+     */
+    public void guardarFactura(Factura factura) throws IOException {
+        
+        ObjectOutputStream out = null;
+        out = new ObjectOutputStream(new FileOutputStream(fichero,true));
+        
+        //this.getRegistro().put(factura.getNumFactura(), factura);
+        
+        out.writeUnshared(factura);
+        out.flush();
+        
+        out.close();
     }
 
     public int leerFichero() throws IOException, ClassNotFoundException {
@@ -76,25 +106,29 @@ public class Facturacion {
         FileInputStream fileIn = null;
         ObjectInputStream in = null;
 
+        //Como vamos a volcar los datos del fichero en la colección, si tiene datos los borramos
         if (!this.getRegistro().isEmpty()) {
             this.getRegistro().clear();
         }
 
         try {
-            System.out.println(this.getFichero().getName());
-            System.out.println(this.getFichero().getPath());
-            String file = fichero.getAbsolutePath();
-            System.out.println(file);
-            
-            fileIn = new FileInputStream(file);
+//            System.out.println(this.getFichero().getName());
+//            System.out.println(this.getFichero().getPath());
+//            String file = fichero.getAbsolutePath();
+//            System.out.println(file);
+
+            fileIn = new FileInputStream(fichero);
             in = new ObjectInputStream(fileIn);
 
             Factura aux = new Factura();
             while (true) {
                 aux = (Factura) in.readObject();
+                in.reset();
+                System.out.println(aux.toString());
                 totalCompras++;
                 this.getRegistro().put(totalCompras, aux);
             }
+            
         } catch (FileNotFoundException e) {
             fileIn.close();
             in.close();
@@ -106,22 +140,32 @@ public class Facturacion {
         }
 
     }
-
-    public boolean guardarFactura() throws IOException {
-        ObjectOutputStream out = null;
-        out = new ObjectOutputStream(new FileOutputStream(fichero));
-        out.writeUnshared(this.getFactura());
-        return false;
+    
+    /**
+     * Muestra por consola las distintas facturas registradas en la coleccion 
+     * interna de la clase Facturacion
+     */
+    public void mostrarFacturacion(){
+        
+      for(Factura factura : this.getRegistro().values()){
+          System.out.println("Número de factura : "+factura.getNumFactura());
+          System.out.println("Fecha de compra : "+factura.getFecha());
+          System.out.println("-----------------------------------------");
+          System.out.println("NºLinea | Producto                        | Cantidad | Precio ");
+          for (String linea: factura.getLineas()) {
+              System.out.println("-----------------------------------------");
+              System.out.println(linea);
+          }
+          System.out.println("-----------------------------------------");
+          System.out.println("                    Total : "+factura.getTotal());
+      }
+        
     }
-
-    public Factura getFactura() {
-        return factura;
-    }
-
-    public void setFactura(Factura factura) {
-        this.factura = factura;
-    }
-
+    
+    
+    //**************************************************************************
+    //GETTERS & SETTERS
+    
     public File getFichero() {
         return fichero;
     }

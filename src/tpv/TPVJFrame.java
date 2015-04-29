@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -95,6 +96,9 @@ public class TPVJFrame extends JFrame {
         jPanelTPV = new JPanel(new BorderLayout(10, 10));
         jPanelTPV.setBorder(new EmptyBorder(15, 15, 15, 15));
         jPanelTPV.setBackground(AZUL_CLARO);
+      
+        setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/tpv.jpg")).getImage());
+      
         crearEncabezado();
         crearZonaProductos();
         crearZonaFactura();
@@ -381,6 +385,11 @@ public class TPVJFrame extends JFrame {
         jLabelTotal.setText("" + big);
     }
 
+    /**
+     * Método que se encarga de rellenar el Objeto Info con la información de la compra
+     * y enviar la información a el CPTV
+     * 
+     */
     public void mandarInfo() {
         if (this.getInfo().getLineas().size() > 0) {
             this.getInfo().getLineas().clear();
@@ -403,6 +412,11 @@ public class TPVJFrame extends JFrame {
 
     }
 
+    /**
+     * Método que elimina de la lista de los productos añadidos a la compra la lineas seleccionadas,
+     * actuliza la tabla de los productos y el total de la compra 
+     * y manda la información actualizada al CTPV
+     */
     private void eliminar() {
         int[] indices = tabla.getSelectedRows();
         for (int i = 0; i < indices.length; i++) {

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 /**
@@ -92,6 +93,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CTPV");
+        setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/Tienda.jpg")).getImage());
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 prueba(evt);
@@ -230,6 +232,10 @@ public class CTPV_Frame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPanel;
     // End of variables declaration//GEN-END:variables
+    
+    //**************************************************************************
+    //GETTERS & SETTERS
+    
     public Terminal_Frame[] getLista() {
         return lista;
     }

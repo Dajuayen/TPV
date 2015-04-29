@@ -5,6 +5,7 @@
  */
 package central;
 
+import datos.Factura;
 import datos.Info;
 import java.io.File;
 import java.io.IOException;
@@ -67,12 +68,14 @@ public class Venta extends Thread {
                     this.getMiSocket().close();
 //                    this.getTerminal().getjLabelFinal().setVisible(true);
 //                    Thread.sleep(3000);
-                    this.getApp().getFacturacion().rellenarFactura(this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal().getText());
+                    this.getApp().getFacturacion().leerFichero();
+                    Factura aux = this.getApp().getFacturacion().rellenarFactura(this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal().getText());
 //                    this.getFacturacion().rellenarFactura();
-                    this.getApp().getFacturacion().guardarFactura();
+                    this.getApp().getFacturacion().guardarFactura(aux);
                     this.getTerminal().compraFinalizada();
 //                    this.getTerminal().reset();
 //                    this.getApp().borrarTerminal(getTerminal());
+                    this.getApp().getFacturacion().mostrarFacturacion();
                 }
 
             }

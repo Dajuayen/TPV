@@ -33,14 +33,16 @@ public class Factura implements Serializable {
 
     }
 
-    
+    //**************************************************************************
+    //GETTERS & SETTERS
     public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha){
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
+
     public int getNumFactura() {
         return numFactura;
     }
@@ -65,9 +67,21 @@ public class Factura implements Serializable {
         this.lineas = lineas;
     }
 
-        @Override
+    @Override
     public String toString() {
-        return fecha.toString() + "/n Número de factura : " + numFactura;
+        StringBuilder aux = new StringBuilder();
+        aux.append("Número de factura : " + this.getNumFactura() + "\n");
+        aux.append("Fecha de compra : " + this.getFecha()+ "\n");
+        aux.append("-----------------------------------------"+ "\n");
+        aux.append("NºLinea | Producto                        | Cantidad | Precio "+ "\n");
+        for (String linea : this.getLineas()) {
+            aux.append("-----------------------------------------"+ "\n");
+            aux.append(linea+ "\n");
+        }
+        aux.append("-----------------------------------------"+ "\n");
+        aux.append("                    Total : " + this.getTotal()+ "\n");
+
+        return aux.toString();
 
     }
 }
