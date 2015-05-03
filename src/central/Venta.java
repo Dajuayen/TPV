@@ -82,7 +82,11 @@ public class Venta extends Thread {
 
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+        } catch (Exception ex) {
+            System.out.println("Error generico");
+            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        finally {
             try {
                 this.getIn().close();
                 if(!this.getMiSocket().isClosed())this.getMiSocket().close();

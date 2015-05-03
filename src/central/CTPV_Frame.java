@@ -96,7 +96,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
         setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/Tienda.jpg")).getImage());
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
-                prueba(evt);
+                cerrarTodo(evt);
             }
         });
 
@@ -116,9 +116,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void prueba(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_prueba
-        // TODO add your handling code here:
-    }//GEN-LAST:event_prueba
+    private void cerrarTodo(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_cerrarTodo
+        getFacturacion().cerrarFacturacion();
+    }//GEN-LAST:event_cerrarTodo
 
     /**
      * @param args the command line arguments

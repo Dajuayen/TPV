@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,7 +12,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -144,12 +144,12 @@ public class TPVJFrame extends JFrame {
         jButtonSalir.setIcon(new ImageIcon("..\\TPV\\src\\imagenes\\Menus\\Salir2.png"));
         jButtonSalir.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                salir();
+            public void actionPerformed(ActionEvent ae) {
+                salir(ae, null);
             }
         });
         jPanelIzquierdo.add(jButtonSalir);
-
+ 
         JPanel jPanelDerecho = new JPanel(new FlowLayout(10));
         jPanelDerecho.setBackground(AZUL_CLARO);
 
@@ -215,9 +215,15 @@ public class TPVJFrame extends JFrame {
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
-                salir();
+                salir(null, we);
             }
         });
+
+//        addWindowListener(new java.awt.event.WindowAdapter() {
+//            public void windowClosing(java.awt.event.WindowEvent evt) {
+//                metodo(evt);
+//            }
+//        });
 
         jPanelEncabezado.add(jPanelIzquierdo, BorderLayout.WEST);
         jPanelEncabezado.add(jPanelDerecho, BorderLayout.EAST);
@@ -439,7 +445,7 @@ public class TPVJFrame extends JFrame {
      * Método que se encarga de enviar los datos con la información predeterminada para
      * que el servidor sepa que el objeto TPVJFrame concreto va a cerrarse
      */
-    private void salir() {
+    private void salir(ActionEvent evt, WindowEvent we) {
         try {
             getInfo().getLineas().clear();
             Vector vacio = new Vector();
