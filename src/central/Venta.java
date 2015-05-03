@@ -7,7 +7,6 @@ package central;
 
 import datos.Factura;
 import datos.Info;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -29,12 +28,10 @@ public class Venta extends Thread {
     private Socket miSocket;
     private ObjectInputStream in;
 
-    
-
     public Venta(Socket miSocket, CTPV_Frame app, int index) {
         this.app = app;
         this.terminal = app.getLista()[index];
-        this.terminal.setVisible(true); 
+        this.terminal.setVisible(true);
 
         this.miSocket = miSocket;
         try {
@@ -42,7 +39,7 @@ public class Venta extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
+
         this.columnas = new Vector();
         this.columnas.addElement("Productos");
         this.columnas.addElement("Cantidad");
@@ -53,29 +50,20 @@ public class Venta extends Thread {
     @Override
     public void run() {
         try {
-
-            //while (Object obj = this.getIn().readObject()!=null) {
             while (!this.getMiSocket().isClosed()) {
-                // while (true) {
-                // if (!this.getMiSocket().isClosed()) {
+                
                 Object obj = this.getIn().readObject();
                 System.out.println("entro");
-
+                //Compruevo el Objeto que me ha llegado, defende lo que contenga relleno el terminal o cierro comunicacion
                 if (rellenarTerminal(obj)) {
                     this.terminal.repaint();
                 } else {
-//                    this.getIn().close();
-                    this.getMiSocket().close();
-//                    this.getTerminal().getjLabelFinal().setVisible(true);
-//                    Thread.sleep(3000);
-                    this.getApp().getFacturacion().leerFichero();
+                    this.getMiSocket().close();//Cierro el socket                   
+                    this.getApp().getFacturacion().leerFichero();//leo el fichero con las facturas
                     Factura aux = this.getApp().getFacturacion().rellenarFactura(this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal().getText());
-//                    this.getFacturacion().rellenarFactura();
-                    this.getApp().getFacturacion().guardarFactura(aux);
-                    this.getTerminal().compraFinalizada();
-//                    this.getTerminal().reset();
-//                    this.getApp().borrarTerminal(getTerminal());
-                    this.getApp().getFacturacion().mostrarFacturacion();
+                    this.getApp().getFacturacion().guardarFactura(aux);//Guardo la factura
+                    this.getTerminal().compraFinalizada();//Muestro la ventana emergente
+                    this.getApp().getFacturacion().mostrarFacturacion();//Muestro por ventana la facturación
                 }
 
             }
@@ -85,13 +73,12 @@ public class Venta extends Thread {
         } catch (Exception ex) {
             System.out.println("Error generico");
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        finally {
+        } finally {
             try {
                 this.getIn().close();
-                if(!this.getMiSocket().isClosed())this.getMiSocket().close();
-                //this.getTerminal().compraFinalizada();
-                // Thread.sleep(3000);
+                if (!this.getMiSocket().isClosed()) {
+                    this.getMiSocket().close();
+                }
                 this.getTerminal().reset();
                 this.getApp().borrarTerminal(getTerminal());
             } catch (IOException ex) {
@@ -175,5 +162,5 @@ public class Venta extends Thread {
     public void setApp(CTPV_Frame app) {
         this.app = app;
     }
-    
+
 }

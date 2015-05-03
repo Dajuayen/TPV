@@ -81,8 +81,7 @@ public class Facturacion {
             aux.getLineas().add(linea.toString());
 
         }
-        //Introducimos el numero de la factura
-        //leerFichero();
+
         int num = 1 + this.getRegistro().size();
         aux.setNumFactura(num);
 
@@ -100,9 +99,6 @@ public class Facturacion {
      */
     public void guardarFactura(Factura factura) throws IOException {
 
-//        ObjectOutputStream out = null;
-//        out = new ObjectOutputStream(new FileOutputStream(fichero, true));
-        //this.getRegistro().put(factura.getNumFactura(), factura);
         out.writeUnshared(factura);
         out.flush();
 
@@ -110,26 +106,18 @@ public class Facturacion {
 
     public void leerFichero() throws IOException, ClassNotFoundException {
         int totalCompras = 0;
-//        FileInputStream fileIn = null;
-//        ObjectInputStream in = null;
 
         //Como vamos a volcar los datos del fichero en la colección, si tiene datos los borramos
         if (!this.getRegistro().isEmpty()) {
             this.getRegistro().clear();
         }
+        
+        long tamanioFichero = fichero.length();//Longitud del fichero
 
-//            System.out.println(this.getFichero().getName());
-//            System.out.println(this.getFichero().getPath());
-//            String file = fichero.getAbsolutePath();
-//            System.out.println(file);
-        long tamanioFichero = fichero.length();
-
+        //Si el tamaño del fichero es mayor a 0, es decir si no esta vacio
         if (tamanioFichero > 0) {
 
             try {
-                
-//                fileIn = new FileInputStream(fichero);
-//                in = new ObjectInputStream(fileIn);
 
                 Factura aux = new Factura();
                 while (true) {
@@ -140,19 +128,13 @@ public class Facturacion {
                     this.getRegistro().put(totalCompras, aux);
                 }
 
-//            } catch (FileNotFoundException e) {
-//                fileIn.close();
-//                in.close();
             } catch (EOFException e) {
                 System.out.println("Final del archivo");
-//                try {
-//                    fileIn.close();
-//                    in.close();
-//                    //return totalCompras;
+
             } catch (Exception edfdf) {
                 System.out.println(edfdf.getMessage());
             }
-            //       }
+         
         }
     }
 
@@ -177,6 +159,10 @@ public class Facturacion {
 
     }
 
+    /**
+     * Método que cierra los canales de salida y entrada 
+     * y marca el fichero como solo lectura
+     */
     public void cerrarFacturacion(){
         try {
             this.fichero.setWritable(false);
