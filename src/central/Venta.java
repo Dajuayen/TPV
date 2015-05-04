@@ -152,6 +152,13 @@ public class Venta extends Thread {
         return b;
     }
 
+    /**
+     * Método sincronizado que guarda en el fichero del objeto CTPV_Frame
+     * la compra llevada a cabo en el terminal que controla el hilo del objeto Venta.
+     * 
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     private synchronized void guardarVenta() throws IOException, ClassNotFoundException {
         double total = 0.0;
         DecimalFormat decimales;
@@ -183,21 +190,21 @@ public class Venta extends Thread {
                     total = total + Double.parseDouble((String) linea.get(j));
                 }
             }
-            System.out.println(contenido.toString());
+            
+            //Ecribimos en el archivo las linea de la compra
             this.getApp().getOut().println(contenido.toString());
             this.getApp().getOut().flush();
 
         }
+        //Escribimos el total
         this.getApp().getOut().println("                                           Total : " + decimales.format(total) + " €");
         this.getApp().getOut().flush();
+        //Escribimos el cierre de la compra 
         this.getApp().getOut().println("***********************************************************");
         this.getApp().getOut().flush();
 
-//                    this.getApp().getFacturacion().leerFichero();//leo el fichero con las facturas
-//        Factura aux = this.getApp().getFacturacion().rellenarFactura(this.getTerminal().getModeloTabla(), this.getTerminal().getjLabelTotal().getText());
-//        this.getApp().getFacturacion().guardarFactura(aux);//Guardo la factura
         this.getTerminal().compraFinalizada();//Muestro la ventana emergente
-//                    this.getApp().getFacturacion().mostrarFacturacion();//Muestro por ventana la facturación
+
     }
 //*******************************************************************************
 //GETTERS & SETTERS

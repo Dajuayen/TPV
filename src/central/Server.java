@@ -27,6 +27,13 @@ public class Server implements Runnable {
         this.app = app;
     }
 
+    /**
+     * Método del arranca el hilo del servidor que permanecera abierto mientras lo este el CTPV,
+     * se encargará de estar a la escucha para aceptar a TPV que se arranquen.
+     *
+     * Inicializa el hilo Venta que se encargar de atender al TPV que se conecta.
+     * 
+     */
     @Override
     public void run() {
         DataOutputStream out = null;
@@ -56,9 +63,10 @@ public class Server implements Runnable {
 
                     this.getApp().repaint();
                 } else {
+                    //Lanza la ventana emergente que avisa que se ha llegado al máximo de TPV conectados
                     JOptionPane.showMessageDialog(this.getApp(), "Limite de terminales alcanzado");
                      out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF("ocupado");
+                    out.writeUTF("ocupado");//Envia el mensaje para que se cierre el TPV que ha intentado conectarse
                     socket.close();
                 }
                 Thread.sleep(200);

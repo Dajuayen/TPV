@@ -219,12 +219,6 @@ public class TPVJFrame extends JFrame {
             }
         });
 
-//        addWindowListener(new java.awt.event.WindowAdapter() {
-//            public void windowClosing(java.awt.event.WindowEvent evt) {
-//                metodo(evt);
-//            }
-//        });
-
         jPanelEncabezado.add(jPanelIzquierdo, BorderLayout.WEST);
         jPanelEncabezado.add(jPanelDerecho, BorderLayout.EAST);
         jPanelTPV.add(jPanelEncabezado, BorderLayout.NORTH);
@@ -393,7 +387,7 @@ public class TPVJFrame extends JFrame {
 
     /**
      * Método que se encarga de rellenar el Objeto Info con la información de la compra
-     * y enviar la información a el CPTV
+     * y enviar la información por el flujo de comunicación
      * 
      */
     public void mandarInfo() {
@@ -407,7 +401,7 @@ public class TPVJFrame extends JFrame {
         try {
 
             System.out.println("Tamaño de lo mandado = " + this.getInfo().getLineas().size());
-            //this.getOut().writeObject(this.getInfo());
+            
             this.getOut().writeUnshared(this.getInfo());
             this.getOut().flush();
             this.getOut().reset();
@@ -456,6 +450,17 @@ public class TPVJFrame extends JFrame {
     /**
      * Método que se encarga de enviar los datos con la información predeterminada para
      * que el servidor sepa que el objeto TPVJFrame concreto va a cerrarse
+     */
+    
+    /**
+     * Método que se encarga de enviar los datos con la información predeterminada para
+     * que el servidor sepa que el objeto TPVJFrame va a cerrarse
+     * Recibe como parametros un ActionEvent y un WindowEvent porque atiende tanto a
+     * un evento provocado por un componente como por la ventana respectivamente.
+     * El evento que no se recibe se rellena a null.
+     * 
+     * @param evt
+     * @param we 
      */
     private void salir(ActionEvent evt, WindowEvent we) {
         try {
