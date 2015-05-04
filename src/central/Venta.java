@@ -5,16 +5,10 @@
  */
 package central;
 
-import com.sun.jmx.snmp.BerDecoder;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import datos.Info;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,7 +75,7 @@ public class Venta extends Thread {
                 if (rellenarTerminal(obj)) {
                     this.terminal.repaint();
                 } else {
-                    guardarVenta();
+                    this.getApp().guardarVenta(getMiSocket(), getTerminal());
                 }
 
             }
@@ -152,60 +146,7 @@ public class Venta extends Thread {
         return b;
     }
 
-    /**
-     * Método sincronizado que guarda en el fichero del objeto CTPV_Frame
-     * la compra llevada a cabo en el terminal que controla el hilo del objeto Venta.
-     * 
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     */
-    private synchronized void guardarVenta() throws IOException, ClassNotFoundException {
-        double total = 0.0;
-        DecimalFormat decimales;
-        decimales = new DecimalFormat("0.00");
-        StringBuilder contenido = new StringBuilder();
-        //Cierro el socket
-        this.getMiSocket().close();
-        
-        //Coloco la fecha formateada para distinguir las compras
-        SimpleDateFormat fecha = new SimpleDateFormat("HH:mm:ss EEEE d MMMM yyyy");        
-        this.getApp().getOut().println(fecha.format(new Date()));
-        this.getApp().getOut().flush();
-        
-        //cogo las lineas de la compra
-        for (int i = 0; i < this.getTerminal().getModeloTabla().getRowCount(); i++) {
-            Vector linea = (Vector) this.getTerminal().getModeloTabla().getDataVector().get(i);
-            if (contenido.length() > 0) {
-                contenido.delete(0, contenido.length());
-            }
-            contenido.append(String.valueOf(i + 1));
-            System.out.println(contenido.toString());
-            for (int j = 0; j < linea.size(); j++) {
-                contenido.append("   ||   ");
-                contenido.append(linea.get(j));
-                if (j == 0) {
-                    contenido.setLength(40);
-                }
-                if (j == 2) {
-                    total = total + Double.parseDouble((String) linea.get(j));
-                }
-            }
-            
-            //Ecribimos en el archivo las linea de la compra
-            this.getApp().getOut().println(contenido.toString());
-            this.getApp().getOut().flush();
-
-        }
-        //Escribimos el total
-        this.getApp().getOut().println("                                           Total : " + decimales.format(total) + " €");
-        this.getApp().getOut().flush();
-        //Escribimos el cierre de la compra 
-        this.getApp().getOut().println("***********************************************************");
-        this.getApp().getOut().flush();
-
-        this.getTerminal().compraFinalizada();//Muestro la ventana emergente
-
-    }
+    
 //*******************************************************************************
 //GETTERS & SETTERS
 

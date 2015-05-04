@@ -5,15 +5,21 @@
  */
 package central;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -28,7 +34,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
 //    private Facturacion facturacion;
     private File fichero;
 //    private FileWriter out;
-    private PrintWriter out;
+//    private PrintWriter out;
 
     /**
      * Creates new form CTPV_Frame
@@ -47,7 +53,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
         try {
 
             System.out.println(fichero.createNewFile());
-            this.out = new PrintWriter (new FileWriter(fichero,true));
+//            this.out = new PrintWriter (new FileWriter(fichero,true));
 //            this.facturacion = new Facturacion(fichero);
         } catch (IOException ex) {
             Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
@@ -69,11 +75,6 @@ public class CTPV_Frame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CTPV");
         setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/Tienda.jpg")).getImage());
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                cerrarTodo(evt);
-            }
-        });
 
         jDesktopPanel.setLayout(new java.awt.GridLayout(2, 3));
 
@@ -90,10 +91,6 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void cerrarTodo(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_cerrarTodo
-        out.close();
-    }//GEN-LAST:event_cerrarTodo
 
     /**
      * @param args the command line arguments
@@ -193,6 +190,69 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
     }
 
+    /**
+     * Método sincronizado que guarda en el fichero del objeto CTPV_Frame la
+     * compra llevada a cabo en el terminal que controla el hilo del objeto
+     * Venta. Recibe como parametro el socket para cerrarlo y el terminal donde
+     * esta la tabla de la compra.
+     *
+     * @param socket
+     * @param terminal
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public synchronized void guardarVenta(Socket socket, Terminal_Frame terminal) throws IOException, ClassNotFoundException {
+        if (terminal.getModeloTabla().getRowCount() > 0) {//comprueba si hay productos en la compra
+            double total = 0.0;
+            DecimalFormat decimales;
+            decimales = new DecimalFormat("0.00");
+            StringBuilder contenido = new StringBuilder();
+            //Cierro el socket
+            socket.close();
+
+            PrintWriter out = new PrintWriter(new FileWriter(fichero, true));
+
+            //Coloco la fecha formateada para distinguir las compras
+            SimpleDateFormat fecha = new SimpleDateFormat("HH:mm:ss EEEE d MMMM yyyy");
+            out.println(fecha.format(new Date()));
+            out.flush();
+
+            //cogo las lineas de la compra
+            for (int i = 0; i < terminal.getModeloTabla().getRowCount(); i++) {
+                Vector linea = (Vector) terminal.getModeloTabla().getDataVector().get(i);
+                if (contenido.length() > 0) {
+                    contenido.delete(0, contenido.length());
+                }
+                contenido.append(String.valueOf(i + 1));
+                System.out.println(contenido.toString());
+                for (int j = 0; j < linea.size(); j++) {
+                    contenido.append("   ||   ");
+                    contenido.append(linea.get(j));
+                    if (j == 0) {
+                        contenido.setLength(40);
+                    }
+                    if (j == 2) {
+                        total = total + Double.parseDouble((String) linea.get(j));
+                    }
+                }
+
+                //Ecribimos en el archivo las linea de la compra
+                out.println(contenido.toString());
+                out.flush();
+
+            }
+            //Escribimos el total
+            out.println("                                           Total : " + decimales.format(total) + " €");
+            out.flush();
+            //Escribimos el cierre de la compra 
+            out.println("***********************************************************");
+            out.flush();
+            //Cerramos el flujo de comunicación
+            out.close();
+
+            terminal.compraFinalizada();//Muestro la ventana emergente
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPanel;
     // End of variables declaration//GEN-END:variables
@@ -227,11 +287,5 @@ public class CTPV_Frame extends javax.swing.JFrame {
         return fichero;
     }
 
-    public PrintWriter getOut() {
-        return out;
-    }
-//    public Facturacion getFacturacion() {
-//        return facturacion;
-//    }
 
 }

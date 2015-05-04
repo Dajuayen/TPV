@@ -54,7 +54,7 @@ public class Server implements Runnable {
                     
                     this.getApp().insertarTerminal(terminal);
                     
-                    Venta cliente = new Venta(socket, this.getApp(),index);
+                    Venta cliente = new Venta(socket, this.getApp(), index);
 
                     out = new DataOutputStream(socket.getOutputStream());
                     out.writeUTF(cliente.getTerminal().getTitle());
@@ -80,6 +80,7 @@ public class Server implements Runnable {
 
     }
 
+   
     //**************************************************************************
     //GETTERS & SETTERS
     
