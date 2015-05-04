@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package central;
+package ctpv;
 
 import datos.Factura;
 import java.io.EOFException;
@@ -45,7 +45,7 @@ public class Facturacion {
 
     /**
      * Método que recibiendo como parametros un DeFaultTableModel de una compra
-     * y un string con su total genera una Factura con la fecha actual del
+     * y un string con su total, genera una Factura con la fecha actual del
      * sistema, un número de factura, las distintas lineas de la compra sacadas
      * del DefaultTableModel y el total.
      *
@@ -104,6 +104,11 @@ public class Facturacion {
 
     }
 
+    /**
+     * 
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     public void leerFichero() throws IOException, ClassNotFoundException {
         int totalCompras = 0;
 

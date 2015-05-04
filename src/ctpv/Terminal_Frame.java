@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package central;
+package ctpv;
 
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -29,15 +28,9 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         this.modeloTabla.addColumn("Sub-total");
 
         this.jTableLineasCompra.setModel(modeloTabla);// Añadimos el modelo a la tabla
-        
+        this.jLabelFinal.setVisible(false);
     }
 
-    /**
-     * Método que se encarga de vaciar los datos de DefaultTableModel 
-     * Retorna true si consigue llevar a cabo la operación y false si no se consigue
-     * 
-     * @return boolean
-     */
     public boolean vaciar() {
         if (this.modeloTabla.getRowCount() > 0) {
             int a = modeloTabla.getRowCount() - 1;
@@ -50,27 +43,14 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         }
     }
 
-    /**
-     * Método que devuelve el Terminal_Frame a su estado inicial
-     */
     public void reset() {
 
         vaciar();
         this.jLabelTotal.setText("€");
+        this.jLabelFinal.setVisible(false);
         this.setVisible(false);
     }
 
-    /**
-     * Método que se encarga de guardar en el archivo que recibe como parametro 
-     * los datos de la compra y 
-     * de informar a través de una ventana emergente que la 
-     * compra ha sido finalizada y que el Terminal_Frame se va a cerrar.
-     */
-    public void compraFinalizada(){      
-        
-        JOptionPane.showMessageDialog(this, "Compra finalizada");
-    }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -84,10 +64,9 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabelTotal = new javax.swing.JLabel();
+        jLabelFinal = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableLineasCompra = new javax.swing.JTable();
-
-        setIconifiable(true);
 
         jLabel1.setText("Ticket de compra");
 
@@ -95,6 +74,11 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
         jLabelTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelTotal.setText("€");
+
+        jLabelFinal.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabelFinal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelFinal.setText("CLIENTE SERVIDO");
+        jLabelFinal.setEnabled(false);
 
         jTableLineasCompra.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -124,19 +108,23 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addGap(114, 114, 114))
-                    .addComponent(jLabelTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabelTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelFinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(15, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabelFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -148,6 +136,7 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabelFinal;
     private javax.swing.JLabel jLabelTotal;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane3;
@@ -156,6 +145,13 @@ public class Terminal_Frame extends javax.swing.JInternalFrame {
 
 //*******************************************************************************
 //GETTERS & SETTERS
+    public javax.swing.JLabel getjLabelFinal() {
+        return jLabelFinal;
+    }
+
+    public void setjLabelFinal(javax.swing.JLabel jLabelFinal) {
+        this.jLabelFinal = jLabelFinal;
+    }
 
     public javax.swing.JLabel getjLabelTotal() {
         return jLabelTotal;

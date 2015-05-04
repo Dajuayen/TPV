@@ -3,7 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package central;
+
+package ctpv;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -26,50 +26,34 @@ public class Server implements Runnable {
         this.servidor = null;
         this.app = app;
     }
-
+    
+    
+    
     @Override
     public void run() {
-        DataOutputStream out = null;
-        int index;
         try {
             this.setServidor(new ServerSocket(65000));
-            
             while (true) {
-                
                 Socket socket = this.getServidor().accept();
-                index = this.getApp().primeroLibre();
                 
+                Venta cliente = new Venta(socket, this.getApp().devuelveTerminal());
                 
-                if ( index != -1) {                    
-                    
-                    Terminal_Frame terminal = new Terminal_Frame();
-                    terminal.setTitle("Terminal Nº "+(index+1));
-                    
-                    this.getApp().insertarTerminal(terminal);
-                    
-                    Venta cliente = new Venta(socket, this.getApp(),index);
-
-                    out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF(cliente.getTerminal().getTitle());
-
-                    cliente.start();
-
-                    this.getApp().repaint();
-                } else {
-                    JOptionPane.showMessageDialog(this.getApp(), "Limite de terminales alcanzado");
-                     out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF("ocupado");
-                    socket.close();
-                }
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF(cliente.getTerminal().getTitle());
+                
+                cliente.start();
+                
+                this.getApp().repaint();
                 Thread.sleep(200);
             }
-
+            
+            
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
     }
 
     public ServerSocket getServidor() {
@@ -87,5 +71,7 @@ public class Server implements Runnable {
     public void setApp(CTPV_Frame app) {
         this.app = app;
     }
-
+    
+    
+    
 }
