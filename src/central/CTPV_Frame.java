@@ -18,8 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -202,14 +200,16 @@ public class CTPV_Frame extends javax.swing.JFrame {
      * @throws ClassNotFoundException
      */
     public synchronized void guardarVenta(Socket socket, Terminal_Frame terminal) throws IOException, ClassNotFoundException {
+        //Cierro el socket
+        socket.close();
+        
         if (terminal.getModeloTabla().getRowCount() > 0) {//comprueba si hay productos en la compra
             double total = 0.0;
             DecimalFormat decimales;
             decimales = new DecimalFormat("0.00");
             StringBuilder contenido = new StringBuilder();
-            //Cierro el socket
-            socket.close();
 
+            //Creamos el flujo de escritura
             PrintWriter out = new PrintWriter(new FileWriter(fichero, true));
 
             //Coloco la fecha formateada para distinguir las compras
@@ -224,7 +224,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
                     contenido.delete(0, contenido.length());
                 }
                 contenido.append(String.valueOf(i + 1));
-                System.out.println(contenido.toString());
+                
                 for (int j = 0; j < linea.size(); j++) {
                     contenido.append("   ||   ");
                     contenido.append(linea.get(j));
@@ -250,8 +250,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
             //Cerramos el flujo de comunicación
             out.close();
 
-            terminal.compraFinalizada();//Muestro la ventana emergente
+            
         }
+            terminal.compraFinalizada();//Muestro la ventana emergente
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPanel;
@@ -286,6 +287,5 @@ public class CTPV_Frame extends javax.swing.JFrame {
     public File getFichero() {
         return fichero;
     }
-
 
 }
