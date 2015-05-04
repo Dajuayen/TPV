@@ -67,4 +67,10 @@ public class ProductoPedido {
       big = big.setScale(2, RoundingMode.HALF_UP);
       return "" + big;
     }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+    
+    
 }

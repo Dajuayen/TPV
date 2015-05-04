@@ -419,18 +419,30 @@ public class TPVJFrame extends JFrame {
     }
 
     /**
-     * Método que elimina de la lista de los productos añadidos a la compra la lineas seleccionadas,
+     * Método que le resta una unidad a los productos seleccionados de la compra 
+     * y si es necesario los elimina totalmente de la compra,
      * actuliza la tabla de los productos y el total de la compra 
      * y manda la información actualizada al CTPV
      */
     private void eliminar() {
-        int[] indices = tabla.getSelectedRows();
-        for (int i = 0; i < indices.length; i++) {
-            listaPedidos.remove((String) modeloTabla.getValueAt(indices[i], 0));
+        int[] indices = tabla.getSelectedRows();//array de indices de filas seleccionadas 
+        for (int i = 0; i < indices.length; i++) {//bucle que recorre el array de indices seleccionados
+            //recogo la cantidad del producto seleccionado
+           int cantidad =  Integer.parseInt((String) modeloTabla.getValueAt(indices[i], 1));
+           if (cantidad>1){//si la cantidad es mayor a 1 le restaremos una unidad
+               cantidad--;
+               //recogemos de la colección el producto pedido con la clave del nombre
+               ProductoPedido aux = listaPedidos.get((String) modeloTabla.getValueAt(indices[i], 0));
+               aux.setCantidad(cantidad);//Le añadimos la nueva cantidad
+               listaPedidos.put(aux.getNombre(), aux);//Introducimos el nuevo estado del producto a la coleccion
+               
+           }else {//si solo había 1 de cantidad de pedido directamente lo eliminamos de la coleccion del pedido
+               listaPedidos.remove((String) modeloTabla.getValueAt(indices[i], 0));
+           }
         }
-        actualizarTabla();
-        actualizarTotal();
-        mandarInfo();
+        actualizarTabla();//actualizamos tabla
+        actualizarTotal();//actualizamos total
+        mandarInfo();//mandamos la información actualizada
     }
 
     private void crearCalculadora() {
