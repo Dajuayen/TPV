@@ -72,7 +72,7 @@ public class TPVJFrame extends JFrame {
         this.info = new Info();
 
         try {
-            this.cliente = new Socket("localhost", 65000);
+            this.cliente = new Socket("localhost", 50000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
             DataInputStream in = new DataInputStream(this.cliente.getInputStream());
             String titulo = in.readUTF();

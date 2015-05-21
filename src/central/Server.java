@@ -39,7 +39,7 @@ public class Server implements Runnable {
         DataOutputStream out = null;
         int index;
         try {
-            this.setServidor(new ServerSocket(65000));
+            this.setServidor(new ServerSocket(50000));
             
             while (true) {
                 

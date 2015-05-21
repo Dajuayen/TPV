@@ -28,6 +28,9 @@ public class CTPV_Frame extends javax.swing.JFrame {
     private Terminal_Frame[] lista;
 
     private Thread servidor;
+    
+    private StartInforme informe;
+    
 
 //    private Facturacion facturacion;
     private File fichero;
@@ -56,6 +59,11 @@ public class CTPV_Frame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.informe = new StartInforme(this);        
+        new Thread(this.informe).start();
+        
+        System.out.println("Ahora");
 
     }
 
