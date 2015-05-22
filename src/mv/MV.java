@@ -3,13 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package mv;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -17,22 +26,40 @@ import java.util.logging.Logger;
  */
 public class MV extends javax.swing.JFrame {
 
-    private Thread hilo;
+    private Conexion conexion;
+    private RecogerDatos recDatos;
+    private PrivateKey privada;
+
     /**
      * Creates new form MV
      */
     public MV() {
         initComponents();
+        
         try {
-            this.hilo = new Thread(new Conexion(64000, "localhost", this));
-            this.hilo.start();
+            this.conexion = new Conexion(64000, "localhost", 64002);
+            this.recDatos = new RecogerDatos(64002, this);
+
+            this.privada = recuperarClavePrivadaDeFichero();
             
+            Thread hiloConecta = new Thread(conexion);
+            Thread hiloEscucha = new Thread(recDatos);
+
+            hiloConecta.start();
+            hiloEscucha.start();
+
         } catch (SocketException ex) {
             Logger.getLogger(MV.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnknownHostException ex) {
             Logger.getLogger(MV.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MV.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(MV.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(MV.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     /**
@@ -55,6 +82,11 @@ public class MV extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Monitor de ventas");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                cerrando(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -129,6 +161,17 @@ public class MV extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cerrando(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_cerrando
+
+        try {
+            recDatos.setActivo(false);
+            conexion.setEstado(false);            
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_cerrando
+
     /**
      * @param args the command line arguments
      */
@@ -163,6 +206,36 @@ public class MV extends javax.swing.JFrame {
             }
         });
     }
+    
+     public PrivateKey recuperarClavePrivadaDeFichero() throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        File aux;
+        PrivateKey clavePrivada = null;
+        JFileChooser explorador = new JFileChooser("C:\\Users\\David\\Documents\\NetBeansProjects\\TPV");
+        explorador.setDialogTitle("Seleccione clave privada");
+
+        int seleccion = explorador.showOpenDialog(null);
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            aux = explorador.getSelectedFile();
+
+            FileInputStream in = new FileInputStream(aux);
+
+            int numBytes = in.available();
+            byte[] auxPri = new byte[numBytes];
+            in.read(auxPri);
+            //
+            PKCS8EncodedKeySpec pkcs8 = new PKCS8EncodedKeySpec(auxPri);
+            //
+            //Creamos un objeto para descifrar la publica con el algoritmo que la creo
+            KeyFactory keyRSA = KeyFactory.getInstance("RSA");
+            //le pasamos el objeto y devuelve la clave publica
+            clavePrivada = keyRSA.generatePrivate(pkcs8);
+            //
+            System.out.println("Clave Privada recuperada");
+
+        }
+        return clavePrivada;
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -187,7 +260,10 @@ public class MV extends javax.swing.JFrame {
         return jTextFieldTardes;
     }
 
-
-
+    public PrivateKey getPrivada() {
+        return privada;
+    }
+    
+    
 
 }

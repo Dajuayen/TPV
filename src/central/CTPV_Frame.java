@@ -6,17 +6,26 @@
 package central;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 /**
@@ -28,14 +37,13 @@ public class CTPV_Frame extends javax.swing.JFrame {
     private Terminal_Frame[] lista;
 
     private Thread servidor;
-    
-    private StartInforme informe;
-    
 
-//    private Facturacion facturacion;
+    private StartInforme informe;
+    private TreeMap<String, Informe> registro;
+
     private File fichero;
-//    private FileWriter out;
-//    private PrintWriter out;
+
+    private PublicKey publica;
 
     /**
      * Creates new form CTPV_Frame
@@ -45,6 +53,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         this.lista = new Terminal_Frame[6];
+        this.registro = new TreeMap<String, Informe>();
 
         this.servidor = new Thread(new Server(this));
         this.servidor.start();
@@ -53,17 +62,22 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
         try {
 
+            this.publica = recuperarClavePublicaDeFichero();
+
             System.out.println(fichero.createNewFile());
 //            this.out = new PrintWriter (new FileWriter(fichero,true));
 //            this.facturacion = new Facturacion(fichero);
         } catch (IOException ex) {
             Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        this.informe = new StartInforme(this);        
+
+        this.registro = new TreeMap<String, Informe>();
+        this.informe = new StartInforme(this);
         new Thread(this.informe).start();
-        
-        System.out.println("Ahora");
 
     }
 
@@ -196,6 +210,36 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
     }
 
+    public PublicKey recuperarClavePublicaDeFichero() throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        File aux;
+        PublicKey clavePub = null;
+
+        JFileChooser explorador = new JFileChooser("C:\\Users\\David\\Documents\\NetBeansProjects\\TPV");
+        explorador.setDialogTitle("Seleccione clave pública");
+
+        int seleccion = explorador.showOpenDialog(null);
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            aux = explorador.getSelectedFile();
+
+            FileInputStream in = new FileInputStream(aux);
+
+            int numBytes = in.available();
+            byte[] auxPub = new byte[numBytes];
+            in.read(auxPub);
+            //
+            X509EncodedKeySpec X509 = new X509EncodedKeySpec(auxPub);
+            //
+            //Creamos un objeto para descifrar la publica con el algoritmo que la creo
+            KeyFactory keyRSA = KeyFactory.getInstance("RSA");
+            //le pasamos el objeto y devuelve la clave publica
+            clavePub = keyRSA.generatePublic(X509);
+            //
+            System.out.println("Publica recuperada");
+
+        }
+        return clavePub;
+    }
+
     /**
      * Método sincronizado que guarda en el fichero del objeto CTPV_Frame la
      * compra llevada a cabo en el terminal que controla el hilo del objeto
@@ -210,7 +254,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
     public synchronized void guardarVenta(Socket socket, Terminal_Frame terminal) throws IOException, ClassNotFoundException {
         //Cierro el socket
         socket.close();
-        
+
         if (terminal.getModeloTabla().getRowCount() > 0) {//comprueba si hay productos en la compra
             double total = 0.0;
             DecimalFormat decimales;
@@ -232,7 +276,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
                     contenido.delete(0, contenido.length());
                 }
                 contenido.append(String.valueOf(i + 1));
-                
+
                 for (int j = 0; j < linea.size(); j++) {
                     contenido.append("   ||   ");
                     contenido.append(linea.get(j));
@@ -258,9 +302,8 @@ public class CTPV_Frame extends javax.swing.JFrame {
             //Cerramos el flujo de comunicación
             out.close();
 
-            
         }
-            terminal.compraFinalizada();//Muestro la ventana emergente
+        terminal.compraFinalizada();//Muestro la ventana emergente
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPanel;
@@ -294,6 +337,18 @@ public class CTPV_Frame extends javax.swing.JFrame {
 
     public File getFichero() {
         return fichero;
+    }
+
+    public StartInforme getInforme() {
+        return informe;
+    }
+
+    public TreeMap<String, Informe> getRegistro() {
+        return registro;
+    }
+
+    public PublicKey getPublica() {
+        return publica;
     }
 
 }

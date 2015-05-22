@@ -11,7 +11,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,53 +20,61 @@ import java.util.logging.Logger;
  */
 public class Conexion implements Runnable {
 
-    private InetAddress direccionCTPV;
-    private int puertoCTPV;
-
-    private DatagramSocket receptor;
+    private DatagramSocket conector;
 
     private DatagramPacket datagrama;
-    private static final int MAX_LEN = 128;
-    private byte[] buffer;
 
-    private MV mv;
+    private String info;
 
-    public Conexion(int puerto, String direccion, MV mv) throws SocketException, UnknownHostException {
-        this.receptor = new DatagramSocket();
-        this.puertoCTPV = puerto;
-        this.direccionCTPV = InetAddress.getByName(direccion);
-        this.buffer = new byte[MAX_LEN];
-        this.datagrama = new DatagramPacket(buffer, MAX_LEN);
-        this.mv = mv;
+    private boolean estado;
+
+    public Conexion(int puerto, String direccion, int puertoB) throws SocketException, UnknownHostException {
+        this.conector = new DatagramSocket();
+
+        this.info = String.valueOf(puertoB);
+
+        this.datagrama = new DatagramPacket(info.getBytes(), info.getBytes().length, InetAddress.getByName(direccion), puerto);
+
+        this.estado = true;
     }
 
     @Override
     public void run() {
         try {
-            String aux = "a";
-            DatagramPacket clave = new DatagramPacket(aux.getBytes(), aux.getBytes().length, direccionCTPV, puertoCTPV);
-        //StringBuilder resultados = new StringBuilder(MAX_LEN);
-            System.out.println("Enviando: "+new String(clave.getData()));
-            receptor.send(clave);
-            System.out.println("Enviada la clave de conexión");
-            while (true) {
-                System.out.println("Esperando paquete del CTPV");
-                receptor.receive(datagrama);
-                System.out.println("Paquete recibido");
-                StringTokenizer paquete = new StringTokenizer(new String(datagrama.getData()),";");               
-                
-                mv.getjTextFieldLineas().setText(paquete.nextToken());
-                mv.getjTextFieldMananas().setText(paquete.nextToken());
-                mv.getjTextFieldTardes().setText(paquete.nextToken());
+            while (estado) {
 
+                conector.send(datagrama);
+
+                Thread.sleep(500);
             }
-            
+
         } catch (IOException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            receptor.close();
+            String fin = "f" + info;
+            DatagramPacket cierre = new DatagramPacket(fin.getBytes(), fin.getBytes().length, datagrama.getAddress(), datagrama.getPort());
+            setDatagrama(cierre);
             System.out.println("DatagramSocket Conexión cerrado");
+            conector.close();
         }
+    }
+
+    public DatagramPacket getDatagrama() {
+        return datagrama;
+    }
+
+    public void setDatagrama(DatagramPacket datagrama) {
+        this.datagrama = datagrama;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 
 }
