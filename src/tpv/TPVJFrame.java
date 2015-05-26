@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,6 +14,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -33,7 +36,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -67,14 +69,20 @@ public class TPVJFrame extends JFrame {
         //this.setUndecorated(true);
         crearVentana();
 
-        setVisible(true);
         this.info = new Info();
+
         try {
-            this.cliente = new Socket("192.168.1.130", 65000);
+            this.cliente = new Socket("localhost", 50000);
             this.out = new ObjectOutputStream(this.cliente.getOutputStream());
             DataInputStream in = new DataInputStream(this.cliente.getInputStream());
             String titulo = in.readUTF();
-            setTitle(titulo);
+            if (titulo.equals("ocupado")) {
+                System.out.println("Terminal no conectado a CTPV y finalizado");
+                System.exit(0);
+            } else {
+                setTitle(titulo);
+                setVisible(true);
+            }
         } catch (IOException ex) {
             Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -88,6 +96,9 @@ public class TPVJFrame extends JFrame {
         jPanelTPV = new JPanel(new BorderLayout(10, 10));
         jPanelTPV.setBorder(new EmptyBorder(15, 15, 15, 15));
         jPanelTPV.setBackground(AZUL_CLARO);
+      
+        setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/tpv.jpg")).getImage());
+      
         crearEncabezado();
         crearZonaProductos();
         crearZonaFactura();
@@ -133,28 +144,12 @@ public class TPVJFrame extends JFrame {
         jButtonSalir.setIcon(new ImageIcon("..\\TPV\\src\\imagenes\\Menus\\Salir2.png"));
         jButtonSalir.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    getInfo().getLineas().clear();
-                    Vector vacio = new Vector();
-                    getInfo().getLineas().put(-1, vacio);
-
-                    getOut().writeUnshared(getInfo());
-                    getOut().flush();
-                    
-
-                    getOut().close();
-                    getCliente().close();
-
-                    System.exit(0);
-
-                } catch (IOException ex) {
-                    Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            public void actionPerformed(ActionEvent ae) {
+                salir(ae, null);
             }
         });
         jPanelIzquierdo.add(jButtonSalir);
-
+ 
         JPanel jPanelDerecho = new JPanel(new FlowLayout(10));
         jPanelDerecho.setBackground(AZUL_CLARO);
 
@@ -217,6 +212,12 @@ public class TPVJFrame extends JFrame {
             }
         });
         jPanelDerecho.add(jButtonTotal);
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                salir(null, we);
+            }
+        });
 
         jPanelEncabezado.add(jPanelIzquierdo, BorderLayout.WEST);
         jPanelEncabezado.add(jPanelDerecho, BorderLayout.EAST);
@@ -384,6 +385,11 @@ public class TPVJFrame extends JFrame {
         jLabelTotal.setText("" + big);
     }
 
+    /**
+     * Método que se encarga de rellenar el Objeto Info con la información de la compra
+     * y enviar la información por el flujo de comunicación
+     * 
+     */
     public void mandarInfo() {
         if (this.getInfo().getLineas().size() > 0) {
             this.getInfo().getLineas().clear();
@@ -395,7 +401,7 @@ public class TPVJFrame extends JFrame {
         try {
 
             System.out.println("Tamaño de lo mandado = " + this.getInfo().getLineas().size());
-            //this.getOut().writeObject(this.getInfo());
+            
             this.getOut().writeUnshared(this.getInfo());
             this.getOut().flush();
             this.getOut().reset();
@@ -406,14 +412,31 @@ public class TPVJFrame extends JFrame {
 
     }
 
+    /**
+     * Método que le resta una unidad a los productos seleccionados de la compra 
+     * y si es necesario los elimina totalmente de la compra,
+     * actuliza la tabla de los productos y el total de la compra 
+     * y manda la información actualizada al CTPV
+     */
     private void eliminar() {
-        int[] indices = tabla.getSelectedRows();
-        for (int i = 0; i < indices.length; i++) {
-            listaPedidos.remove((String) modeloTabla.getValueAt(indices[i], 0));
+        int[] indices = tabla.getSelectedRows();//array de indices de filas seleccionadas 
+        for (int i = 0; i < indices.length; i++) {//bucle que recorre el array de indices seleccionados
+            //recogo la cantidad del producto seleccionado
+           int cantidad =  Integer.parseInt((String) modeloTabla.getValueAt(indices[i], 1));
+           if (cantidad>1){//si la cantidad es mayor a 1 le restaremos una unidad
+               cantidad--;
+               //recogemos de la colección el producto pedido con la clave del nombre
+               ProductoPedido aux = listaPedidos.get((String) modeloTabla.getValueAt(indices[i], 0));
+               aux.setCantidad(cantidad);//Le añadimos la nueva cantidad
+               listaPedidos.put(aux.getNombre(), aux);//Introducimos el nuevo estado del producto a la coleccion
+               
+           }else {//si solo había 1 de cantidad de pedido directamente lo eliminamos de la coleccion del pedido
+               listaPedidos.remove((String) modeloTabla.getValueAt(indices[i], 0));
+           }
         }
-        actualizarTabla();
-        actualizarTotal();
-        mandarInfo();
+        actualizarTabla();//actualizamos tabla
+        actualizarTotal();//actualizamos total
+        mandarInfo();//mandamos la información actualizada
     }
 
     private void crearCalculadora() {
@@ -424,8 +447,42 @@ public class TPVJFrame extends JFrame {
         TPVJFrame ventana = new TPVJFrame();
     }
 
+    /**
+     * Método que se encarga de enviar los datos con la información predeterminada para
+     * que el servidor sepa que el objeto TPVJFrame concreto va a cerrarse
+     */
+    
+    /**
+     * Método que se encarga de enviar los datos con la información predeterminada para
+     * que el servidor sepa que el objeto TPVJFrame va a cerrarse
+     * Recibe como parametros un ActionEvent y un WindowEvent porque atiende tanto a
+     * un evento provocado por un componente como por la ventana respectivamente.
+     * El evento que no se recibe se rellena a null.
+     * 
+     * @param evt
+     * @param we 
+     */
+    private void salir(ActionEvent evt, WindowEvent we) {
+        try {
+            getInfo().getLineas().clear();
+            Vector vacio = new Vector();
+            getInfo().getLineas().put(-1, vacio);
+
+            getOut().writeUnshared(getInfo());
+            getOut().flush();
+
+            getOut().close();
+            getCliente().close();
+
+            System.exit(0);
+
+        } catch (IOException ex) {
+            Logger.getLogger(TPVJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 //*****************************************************************************
 //Getters & Setters
+
     public Socket getCliente() {
         return cliente;
     }
