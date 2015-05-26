@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -75,7 +76,7 @@ public class CTPV_Frame extends javax.swing.JFrame {
             Logger.getLogger(CTPV_Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        this.registro = new TreeMap<String, Informe>();
+        
         this.informe = new StartInforme(this);
         new Thread(this.informe).start();
 
@@ -211,32 +212,25 @@ public class CTPV_Frame extends javax.swing.JFrame {
     }
 
     public PublicKey recuperarClavePublicaDeFichero() throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        File aux;
+
         PublicKey clavePub = null;
+        File aux = new File("CTPV.publica");
 
-        JFileChooser explorador = new JFileChooser("C:\\Users\\David\\Documents\\NetBeansProjects\\TPV");
-        explorador.setDialogTitle("Seleccione clave pública");
+        FileInputStream in = new FileInputStream(aux);
 
-        int seleccion = explorador.showOpenDialog(null);
-        if (seleccion == JFileChooser.APPROVE_OPTION) {
-            aux = explorador.getSelectedFile();
-
-            FileInputStream in = new FileInputStream(aux);
-
-            int numBytes = in.available();
-            byte[] auxPub = new byte[numBytes];
-            in.read(auxPub);
+        int numBytes = in.available();
+        byte[] auxPub = new byte[numBytes];
+        in.read(auxPub);
+        //
+        X509EncodedKeySpec X509 = new X509EncodedKeySpec(auxPub);
             //
-            X509EncodedKeySpec X509 = new X509EncodedKeySpec(auxPub);
-            //
-            //Creamos un objeto para descifrar la publica con el algoritmo que la creo
-            KeyFactory keyRSA = KeyFactory.getInstance("RSA");
-            //le pasamos el objeto y devuelve la clave publica
-            clavePub = keyRSA.generatePublic(X509);
-            //
-            System.out.println("Publica recuperada");
+        //Creamos un objeto para descifrar la publica con el algoritmo que la creo
+        KeyFactory keyRSA = KeyFactory.getInstance("RSA");
+        //le pasamos el objeto y devuelve la clave publica
+        clavePub = keyRSA.generatePublic(X509);
+        //
+        System.out.println("Publica recuperada");
 
-        }
         return clavePub;
     }
 

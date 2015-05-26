@@ -18,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
 /**
@@ -35,13 +36,13 @@ public class MV extends javax.swing.JFrame {
      */
     public MV() {
         initComponents();
-        
+        //setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/portatil.jpg")).getImage());
         try {
             this.conexion = new Conexion(64000, "localhost", 64002);
             this.recDatos = new RecogerDatos(64002, this);
 
             this.privada = recuperarClavePrivadaDeFichero();
-            
+
             Thread hiloConecta = new Thread(conexion);
             Thread hiloEscucha = new Thread(recDatos);
 
@@ -82,6 +83,7 @@ public class MV extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Monitor de ventas");
+        setIconImage(new ImageIcon(getClass().getResource("/imagenes/Icono/portatil.jpg")).getImage());
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 cerrando(evt);
@@ -165,8 +167,8 @@ public class MV extends javax.swing.JFrame {
 
         try {
             recDatos.setActivo(false);
-            conexion.setEstado(false);            
-            Thread.sleep(1000);
+            conexion.setEstado(false);
+            Thread.sleep(2000);
         } catch (InterruptedException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -206,33 +208,27 @@ public class MV extends javax.swing.JFrame {
             }
         });
     }
-    
-     public PrivateKey recuperarClavePrivadaDeFichero() throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        File aux;
+
+    public PrivateKey recuperarClavePrivadaDeFichero() throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+
         PrivateKey clavePrivada = null;
-        JFileChooser explorador = new JFileChooser("C:\\Users\\David\\Documents\\NetBeansProjects\\TPV");
-        explorador.setDialogTitle("Seleccione clave privada");
+        File aux = new File("MV.privada");
 
-        int seleccion = explorador.showOpenDialog(null);
-        if (seleccion == JFileChooser.APPROVE_OPTION) {
-            aux = explorador.getSelectedFile();
+        FileInputStream in = new FileInputStream(aux);
 
-            FileInputStream in = new FileInputStream(aux);
-
-            int numBytes = in.available();
-            byte[] auxPri = new byte[numBytes];
-            in.read(auxPri);
+        int numBytes = in.available();
+        byte[] auxPri = new byte[numBytes];
+        in.read(auxPri);
+        //
+        PKCS8EncodedKeySpec pkcs8 = new PKCS8EncodedKeySpec(auxPri);
             //
-            PKCS8EncodedKeySpec pkcs8 = new PKCS8EncodedKeySpec(auxPri);
-            //
-            //Creamos un objeto para descifrar la publica con el algoritmo que la creo
-            KeyFactory keyRSA = KeyFactory.getInstance("RSA");
-            //le pasamos el objeto y devuelve la clave publica
-            clavePrivada = keyRSA.generatePrivate(pkcs8);
-            //
-            System.out.println("Clave Privada recuperada");
+        //Creamos un objeto para descifrar la publica con el algoritmo que la creo
+        KeyFactory keyRSA = KeyFactory.getInstance("RSA");
+        //le pasamos el objeto y devuelve la clave publica
+        clavePrivada = keyRSA.generatePrivate(pkcs8);
+        //
+        System.out.println("Clave Privada recuperada");
 
-        }
         return clavePrivada;
 
     }
@@ -263,7 +259,5 @@ public class MV extends javax.swing.JFrame {
     public PrivateKey getPrivada() {
         return privada;
     }
-    
-    
 
 }

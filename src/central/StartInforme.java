@@ -8,6 +8,7 @@ package central;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -55,35 +56,40 @@ public class StartInforme implements Runnable {
                 escuchador.receive(datagrama);
                 aux = new String(datagrama.getData());
 
+                InetAddress direccion = datagrama.getAddress();
+               
+                
                 aux = aux.trim();
 
+                System.out.println("Datagrama recibido: "+aux);
                 //Forma de cerrar un hilo Informe que esta corriendo
                 if (aux.contains("f")) {
                     System.out.println("Pasamos el estado del Informe a false");
-                    aux = (String) aux.subSequence(1, aux.length());
-                    System.out.println(aux);
-                    Informe temp = registro.get(aux);
+                    aux = (String) aux.subSequence(0, aux.length()-1);
+                    System.out.println("He quitado la f?:" +aux);
+                    Informe temp = registro.get(direccion);
                     temp.setEstado(false);
 //                    registro.remove(aux);
                 } else {
                     //Si comprobamos si ha sido antes registrado, su estado o lo registramos
-                    if (!registro.containsKey(aux)) {//El puerto no esta registrado
+                    if (!registro.containsKey(direccion.getHostAddress())) {//El ip no esta registrada
                         System.out.println("Registramos el Informe");
-                        System.out.println("Otro intento de conexion");
+                        
                         Informe informe = new Informe(ctpv, aux, datagrama.getAddress());
                         Thread hilo = new Thread(informe);
                         hilo.start();
-                        registro.put(aux, informe);
+                        
+                        registro.put(direccion.getHostAddress(), informe);
                     } else {
-                        //El puerto ya esta registrado
-                        Informe temp = registro.get(aux);
+                        //La ip ya esta registrada
+                        Informe temp = registro.get(direccion.getHostAddress());
                         if (!temp.isEstado()) {//Si es un hilo que se paro
-                            System.out.println("Sustituimos el Informe del puerto registrado");
+                            System.out.println("Sustituimos el Informe de la ip registrada");
                             //Lo sustituimos por si ha cambiado la dirección IP
                             Informe informe = new Informe(ctpv, aux, datagrama.getAddress());
                             Thread hilo = new Thread(informe);
                             hilo.start();
-                            registro.put(aux, informe);
+                            registro.put(direccion.getHostAddress() ,informe);
                         }
                     }
                 }

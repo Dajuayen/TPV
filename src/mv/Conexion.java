@@ -48,14 +48,20 @@ public class Conexion implements Runnable {
                 Thread.sleep(500);
             }
 
+            String fin = info+"f" ;
+            
+            DatagramPacket cierre = new DatagramPacket(fin.getBytes(), fin.getBytes().length, datagrama.getAddress(), datagrama.getPort());
+            setDatagrama(cierre);
+            System.out.println(fin);
+            
         } catch (IOException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
             Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            String fin = "f" + info;
-            DatagramPacket cierre = new DatagramPacket(fin.getBytes(), fin.getBytes().length, datagrama.getAddress(), datagrama.getPort());
-            setDatagrama(cierre);
+//            String fin = "f" + info;
+//            DatagramPacket cierre = new DatagramPacket(fin.getBytes(), fin.getBytes().length, datagrama.getAddress(), datagrama.getPort());
+//            setDatagrama(cierre);
             System.out.println("DatagramSocket Conexión cerrado");
             conector.close();
         }
